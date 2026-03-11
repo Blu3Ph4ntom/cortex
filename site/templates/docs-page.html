@@ -1,20 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main class="docs shell">
-  <aside class="docs-sidebar">
-    <p class="eyebrow">Docs</p>
+<main class="page-shell">
+  <aside class="sidebar">
+    <a class="brand-lockup" href="{{ get_url(path='') }}">
+      <span class="brand-mark"></span>
+      <span class="brand-name">cortex</span>
+    </a>
+    <p class="tagline">BRAIN FOR CODEBASES.</p>
+
+    <div class="theme-switch" aria-hidden="true">
+      <span class="switch-button active">□</span>
+      <span class="switch-button">◌</span>
+      <span class="switch-button">◐</span>
+    </div>
+
     {% set docs = get_section(path="docs/_index.md") %}
-    <nav class="docs-nav">
+    <nav class="rail-nav">
       {% for child in docs.pages %}
-        <a href="{{ child.permalink }}" class="doc-link {% if page.title == child.title %}active{% endif %}">{{ child.title }}</a>
+        <a href="{{ child.permalink }}" class="{% if page.title == child.title %}active{% endif %}">{{ child.title }}</a>
       {% endfor %}
     </nav>
+
+    <div class="sidebar-footer">
+      <a href="{{ config.extra.repo }}">GitHub</a>
+      <a href="{{ get_url(path='') }}">Overview</a>
+    </div>
   </aside>
-  <article class="docs-content prose">
-    <p class="eyebrow">{{ page.title }}</p>
-    <h1>{{ page.title }}</h1>
-    {{ page.content | safe }}
+
+  <article class="content-column prose doc-article">
+    <section class="content-section">
+      <h1>{{ page.title }}</h1>
+      {{ page.content | safe }}
+    </section>
   </article>
 </main>
 {% endblock content %}

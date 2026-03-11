@@ -1,22 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main class="docs shell">
-  <aside class="docs-sidebar">
-    <p class="eyebrow">Docs</p>
+<main class="page-shell">
+  <aside class="sidebar">
+    <a class="brand-lockup" href="{{ get_url(path='') }}">
+      <span class="brand-mark"></span>
+      <span class="brand-name">cortex</span>
+    </a>
+    <p class="tagline">BRAIN FOR CODEBASES.</p>
+
+    <div class="theme-switch" aria-hidden="true">
+      <span class="switch-button active">□</span>
+      <span class="switch-button">◌</span>
+      <span class="switch-button">◐</span>
+    </div>
+
     {% set docs = get_section(path="docs/_index.md") %}
-    <nav class="docs-nav">
+    <nav class="rail-nav">
       {% for child in docs.pages %}
-        <a href="{{ child.permalink }}" class="doc-link">{{ child.title }}</a>
+        <a href="{{ child.permalink }}">{{ child.title }}</a>
       {% endfor %}
     </nav>
+
+    <div class="sidebar-footer">
+      <a href="{{ config.extra.repo }}">GitHub</a>
+      <a href="{{ get_url(path='') }}">Overview</a>
+    </div>
   </aside>
-  <section class="docs-content">
-    <p class="eyebrow">Documentation</p>
-    <h1>Cortex docs cover installation, query usage, and the current system architecture.</h1>
-    <p class="lead">
-      Start with the install path, move into the query model, then read the architecture notes if you are integrating or contributing.
-    </p>
+
+  <section class="content-column">
+    <section class="content-section">
+      <h1>Documentation</h1>
+      <p class="hero-copy">Start with installation, then move into query usage and the current architecture of the Cortex engine.</p>
+    </section>
   </section>
 </main>
 {% endblock content %}
