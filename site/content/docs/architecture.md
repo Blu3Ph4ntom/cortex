@@ -4,8 +4,6 @@ weight = 3
 description = "Understand the Rust monorepo, the indexing pipeline, and the graph shape Cortex serves today."
 +++
 
-# Architecture
-
 Cortex is organized as a Rust monorepo with three crates:
 
 - `cortex-core`

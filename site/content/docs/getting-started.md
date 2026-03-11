@@ -4,8 +4,6 @@ weight = 1
 description = "Install Cortex, build your first local index, and run the first useful queries."
 +++
 
-# Getting Started
-
 Cortex ships as a Rust monorepo with two user-facing binaries:
 
 - `cortex`: local CLI

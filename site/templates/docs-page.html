@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main class="docs-wrap shell">
+<main class="docs shell">
   <aside class="docs-sidebar">
-    <p class="eyebrow">Documentation</p>
+    <p class="eyebrow">Docs</p>
     {% set docs = get_section(path="docs/_index.md") %}
     <nav class="docs-nav">
       {% for child in docs.pages %}
@@ -11,7 +11,7 @@
       {% endfor %}
     </nav>
   </aside>
-  <article class="prose docs-article">
+  <article class="docs-content prose">
     <p class="eyebrow">{{ page.title }}</p>
     <h1>{{ page.title }}</h1>
     {{ page.content | safe }}

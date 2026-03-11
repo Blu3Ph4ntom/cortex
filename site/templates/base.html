@@ -8,18 +8,13 @@
   <meta name="theme-color" content="#0b0b0c">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,600;6..72,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ get_url(path='style.css') }}">
 </head>
 <body>
-  <div class="page-haze"></div>
-  <div class="page-grid"></div>
   <header class="site-header">
     <div class="shell topbar">
-      <a class="brand" href="{{ get_url(path='') }}">
-        <span class="brand-mark"></span>
-        <span class="brand-text">Cortex</span>
-      </a>
+      <a class="brand" href="{{ get_url(path='') }}">Cortex</a>
       <nav class="nav">
         <a href="{{ get_url(path='') }}">Overview</a>
         <a href="{{ get_url(path='docs/') }}">Docs</a>
@@ -30,19 +25,12 @@
   {% block content %}{% endblock content %}
   <footer class="site-footer">
     <div class="shell footer-inner">
-      <div>
-        <p class="footer-title">Cortex</p>
-        <p class="footer-copy">Local-first code knowledge for AI agents, editors, and engineers working inside real repositories.</p>
-      </div>
+      <p class="footer-brand">Cortex</p>
       <div class="footer-links">
         <a href="{{ get_url(path='docs/getting-started/') }}">Getting Started</a>
         <a href="{{ get_url(path='docs/queries/') }}">Queries</a>
         <a href="{{ get_url(path='docs/architecture/') }}">Architecture</a>
-        <a href="{{ config.extra.repo }}">Repository</a>
-      </div>
-      <div class="footer-meta">
-        <span>Measured on this repo</span>
-        <strong>{{ config.extra.stats_files }} files / {{ config.extra.stats_symbols }} symbols / {{ config.extra.stats_edges }} edges</strong>
+        <a href="{{ config.extra.repo }}">GitHub</a>
       </div>
     </div>
   </footer>

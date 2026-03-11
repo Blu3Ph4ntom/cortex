@@ -4,8 +4,6 @@ weight = 2
 description = "Use typed queries to ask Cortex about symbols, callers, dependencies, references, and impact."
 +++
 
-# Queries
-
 Cortex currently exposes these machine-readable query families:
 
 - `find-symbol`

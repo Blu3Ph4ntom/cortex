@@ -1,156 +1,90 @@
 # Cortex
 
-Cortex is a local-first code intelligence engine for AI agents and developer tools. It turns a repository into a persistent semantic graph so tools can ask structural questions about symbols, files, call relationships, and impact instead of guessing with text search.
+Cortex is a local-first code knowledge engine for AI agents and developer tools.
 
-Status:
+It indexes a repository into a persistent semantic graph so tools can ask structural questions like:
 
-- OSS-ready: yes
-- usable today for local structural analysis and agent context: yes
-- production-ready for broad autonomous code-editing at scale: no, not yet
-- current maturity: beta / foundation-stage
-
-Website:
-
-- docs and landing: `https://blu3ph4ntom.github.io/cortex/`
-- custom domain requested: `cortex.bluephantom.dev` can be attached once DNS is pointed at GitHub Pages
-
-## Why It Is Useful
-
-When an agent or developer asks questions like:
-
+- what defines this symbol?
 - what calls this function?
 - what depends on this type?
-- where should I start reading?
-- what might break if I change this symbol?
+- what might break if I change this file?
 
-plain text search usually returns too much noise or misses the structural relationship entirely. Cortex gives you machine-readable graph answers instead.
+Instead of treating code as raw text, Cortex exposes machine-readable structure through a CLI and a local HTTP daemon.
 
-In practice, even on this small self-hosting repo, Cortex already provides three useful advantages:
+## What Cortex Does
 
-- **Fast structural lookup**: `find-symbol RepositorySession` resolves the exact core type definition instead of a pile of mentions.
-- **Call graph discovery**: `callers open_session` returns the actual CLI entrypoints that use it: `main`, `run_index`, `run_query`, and `run_watch`.
-- **Impact and dependency context**: `dependencies RepositorySession --direction both` shows both users of the type and core internals it relies on, which is the kind of context an agent needs before editing.
+- indexes Rust, JavaScript, TypeScript, Python, and Go repositories
+- persists a local graph in `sled`
+- serves typed queries for symbols, dependencies, callers, callees, references, impact, and explain summaries
+- supports local re-indexing and refresh
+- ships as a Rust monorepo with:
+  - `cortex`: CLI
+  - `cortexd`: local daemon
 
-## What Cortex Does Today
+## Status
 
-- Indexes Rust, TypeScript/JavaScript, Python, and Go repositories
-- Stores a persistent local graph in `sled`
-- Supports full re-index and incremental refresh
-- Exposes typed queries for:
-  - symbol lookup
-  - dependencies
-  - callers / callees
-  - references
-  - conservative impact analysis
-  - explain summaries
-- Ships both a CLI and a local HTTP daemon
+Cortex is usable today for local structural awareness, agent context building, and pre-refactor analysis.
 
-## Measured Self-Host Results
+Current maturity:
 
-These are real results from running Cortex against this repository itself:
+- public OSS beta
+- useful for local developer and agent workflows
+- not yet compiler-grade or semantics-complete
+- not yet hardened for large-scale autonomous editing across arbitrary repositories
 
-- `cortex index --repo . --store-path .cortex-readme`
-  - indexed files: `9`
-  - indexed symbols: `165`
-  - indexed edges: `1717`
-- `cortex query --repo . --store-path .cortex-readme find-symbol --name RepositorySession`
-  - resolved the `RepositorySession` type in `crates/cortex-core/src/indexer.rs`
-- `cortex query --repo . --store-path .cortex-readme callers --target open_session`
-  - found `main`, `run_index`, `run_query`, and `run_watch` in the CLI crate
-- `cortex query --repo . --store-path .cortex-readme explain --target RepositorySession`
-  - reported `29` incoming edges and `9` outgoing edges
-- `cortex query --repo . --store-path .cortex-readme dependencies --target RepositorySession --direction both --depth 1`
-  - surfaced direct consumers like CLI `open_session` and daemon `open_index`
-  - surfaced core neighbors like `Indexer`, `SledGraphStore`, and `DefaultExtractorRegistry`
+## Why Use It
 
-That means Cortex is already useful as:
+Text search is a poor interface for structural reasoning. Cortex is useful when an agent or developer needs repository context before changing code.
 
-- a pre-edit context builder for AI agents
-- a quick architecture inspection tool
-- a local dependency explorer
-- a regression aid for refactors
+Examples from this repository:
 
-## Good Use Cases
+- `find-symbol RepositorySession` resolves the actual owner of a core type
+- `callers open_session` surfaces the CLI entrypoints that depend on it
+- `dependencies RepositorySession --direction both --depth 1` exposes the nearby structural neighborhood
 
-- Give an AI coding agent structural context for a repo before editing
-- Trace which local functions call a symbol
-- Estimate what might break if a function or file changes
-- Inspect a repository’s symbol inventory quickly
-- Build agent-side tools that need machine-readable code relationships
-- Generate review context for unfamiliar codebases
-- Confirm call paths before refactors or API changes
+Measured self-host results on this repository:
 
-## Readiness
-
-What is true now:
-
-- the repository is public, documented, buildable, and testable
-- the CLI and daemon are usable by local developers and AI agents
-- the self-test workflow passes on the project itself
-- Pages and CI automation are in place
-
-What is not true yet:
-
-- this is not yet compiler-grade or semantics-complete
-- this is not yet hardened for large-scale autonomous edits across arbitrary repositories
-- there are not yet fixture suites across large real-world polyglot repos
-- there is not yet a stable compatibility policy for query schema evolution
-
-The right framing today is:
-
-- good open-source beta
-- strong foundation for contributors
-- useful for local agent workflows and experimentation
-- not something I would market as fully production-grade code intelligence infrastructure yet
-
-## What It Is Not Yet
-
-- Not a compiler-grade whole-program analysis engine
-- Not a runtime data-flow engine
-- Not a cross-repo knowledge layer yet
-- Not a hosted SaaS or multi-tenant control plane
-- Not a visualization-first product today
+- files indexed: `9`
+- symbols indexed: `165`
+- edges indexed: `1717`
+- `RepositorySession` explain summary: `29` incoming edges, `9` outgoing edges
 
 ## Installation
 
-### Prerequisites
+### Install a release binary
 
-- Rust stable
-- `rustfmt` and `clippy`
-- On Windows, prefer the MSVC toolchain
-
-### Run From Source
+Unix:
 
 ```bash
-cargo run -p cortex-cli --bin cortex -- index --repo .
-cargo run -p cortex-cli --bin cortex -- query --repo . find-symbol --name main
-cargo run -p cortex-daemon --bin cortexd -- --repo . --bind 127.0.0.1:8787
+curl -fsSL https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.sh | sh
 ```
 
-### Install The Binaries
+PowerShell:
+
+```powershell
+iwr https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.ps1 -useb | iex
+```
+
+By default, the installer places binaries in:
+
+- Unix: `~/.local/bin`
+- Windows: `$HOME\.cortex\bin`
+
+### Install from source
 
 ```bash
 cargo install --path crates/cortex-cli
 cargo install --path crates/cortex-daemon
 ```
 
-That installs:
+On Windows, prefer the MSVC toolchain if the GNU toolchain does not provide `gcc.exe` and `dlltool.exe`.
 
-- `cortex`: CLI
-- `cortexd`: daemon
+## Quick Start
 
-## CLI Quick Start
-
-Index a repo:
+Index a repository:
 
 ```bash
 cortex index --repo /path/to/repo
-```
-
-Inspect health:
-
-```bash
-cortex doctor --repo /path/to/repo
 ```
 
 Find a symbol:
@@ -159,101 +93,27 @@ Find a symbol:
 cortex query --repo /path/to/repo find-symbol --name RepositorySession
 ```
 
-Trace callers:
+Check callers before a change:
 
 ```bash
 cortex query --repo /path/to/repo callers --target open_session
 ```
 
-Run a dependency walk:
+Inspect dependencies:
 
 ```bash
-cortex query --repo /path/to/repo dependencies --target RepositorySession --direction both --depth 2
+cortex query --repo /path/to/repo dependencies --target RepositorySession --direction both --depth 1
 ```
 
-Export the graph:
-
-```bash
-cortex export --repo /path/to/repo
-```
-
-Use a custom store path when you want isolated runs:
-
-```bash
-cortex index --repo /path/to/repo --store-path /tmp/cortex-store
-```
-
-## Real Query Scenarios
-
-### 1. Find the core type behind an API
-
-```bash
-cortex query --repo . --store-path .cortex-readme find-symbol --name RepositorySession
-```
-
-Why this matters:
-
-- jumps directly to the semantic definition
-- avoids sorting through imports, references, and docs mentions
-
-### 2. Find who invokes a helper before changing it
-
-```bash
-cortex query --repo . --store-path .cortex-readme callers --target open_session
-```
-
-Observed result on this repo:
-
-- `main`
-- `run_index`
-- `run_query`
-- `run_watch`
-
-Why this matters:
-
-- tells you which flows will feel the change
-- gives agents a concrete edit blast radius
-
-### 3. Inspect the neighborhood around a core type
-
-```bash
-cortex query --repo . --store-path .cortex-readme dependencies --target RepositorySession --direction both --depth 1
-```
-
-Observed result on this repo:
-
-- inbound users include CLI and daemon functions
-- direct neighbors include `Indexer`, `SledGraphStore`, and `DefaultExtractorRegistry`
-
-Why this matters:
-
-- helps an implementer understand a subsystem without reading every file
-- gives a realistic “what is this connected to?” answer
-
-### 4. Get a short explanation for an agent prompt
-
-```bash
-cortex query --repo . --store-path .cortex-readme explain --target RepositorySession
-```
-
-Observed result on this repo:
-
-- `RepositorySession` currently has `29` incoming and `9` outgoing edges
-
-Why this matters:
-
-- useful as compressed context for agents
-- useful for ranking architectural hotspots
-
-## Daemon API
-
-Start the daemon:
+Run the daemon:
 
 ```bash
 cortexd --repo /path/to/repo --bind 127.0.0.1:8787
 ```
 
-Endpoints:
+## HTTP API
+
+Daemon endpoints:
 
 - `POST /index/open`
 - `POST /index/refresh`
@@ -271,20 +131,12 @@ Example:
 curl "http://127.0.0.1:8787/graph/find_symbol?name=RepositorySession"
 ```
 
-## Self-Tested Scenarios
+## Repository Layout
 
-The repository is self-hosting enough to be useful on its own codebase. The current self-test pass covers:
-
-- fresh index into an isolated store path
-- doctor output after indexing
-- symbol search for `main`
-- caller search for `open_session`
-- explain report for `RepositorySession`
-- daemon startup with an isolated store path
-- HTTP query smoke test to `/graph/find_symbol`
-- core incremental refresh regression tests
-
-The automation used for this lives in `scripts/self-test.ps1`, and validation notes live in `docs/SELF-TEST.md`.
+- `crates/cortex-core`: graph model, indexer, extractors, storage, and query engine
+- `crates/cortex-cli`: CLI entrypoint and query commands
+- `crates/cortex-daemon`: local HTTP server for tool integrations
+- `site/`: Zola landing page and docs
 
 ## Development
 
@@ -292,25 +144,27 @@ Format, lint, and test:
 
 ```bash
 cargo fmt
-cargo +stable-x86_64-pc-windows-msvc clippy --all-targets --all-features -- -D warnings
-cargo +stable-x86_64-pc-windows-msvc test
-powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test --all-targets
 ```
 
-## Repository Layout
+Windows self-test:
 
-- `crates/cortex-core`: graph model, indexing, extraction, persistence, queries
-- `crates/cortex-cli`: interactive CLI for local workflows
-- `crates/cortex-daemon`: local HTTP daemon for agents and IDEs
+```powershell
+./scripts/self-test.ps1
+```
 
-## Current Limitations
+## Limitations
 
-- Symbol extraction is intentionally conservative and syntax-driven
-- References can be noisy in large files because they are derived from identifier usage
-- Import resolution is best-effort and local-first, not full compiler resolution
-- The embedded store is single-writer; use `--store-path` when you need isolated concurrent runs
-- Query usefulness is strongest for local structural questions, not deep semantic truth
+- analysis is intentionally conservative and syntax-driven
+- import and reference resolution are best-effort, not compiler-grade
+- the embedded store is single-writer; use `--store-path` for isolated concurrent runs
+- current strength is structural context, not full semantic truth
+
+## Contributing
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 ## License
 
-MIT. See `LICENSE`.
+MIT. See [`LICENSE`](./LICENSE).

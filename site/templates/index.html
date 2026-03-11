@@ -1,168 +1,117 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main>
+<main class="landing">
   <section class="hero shell">
-    <div class="hero-copy">
+    <div class="hero-intro">
       <p class="eyebrow">{{ config.extra.tagline }}</p>
-      <h1>Structural memory for codebases, built for agents.</h1>
-      <p class="hero-lead">
-        Cortex turns a repository into a persistent semantic graph so AI coding agents can ask for
-        callers, dependencies, references, and impact instead of scraping guesses out of text.
-      </p>
-      <p class="hero-subcopy">
-        It is local-first, queryable, and fast enough to sit beside your editor or agent runtime.
-        The current release is a serious OSS beta: useful now for structural context, still conservative in semantic depth.
+      <h1>Cortex gives AI agents structural memory for real codebases.</h1>
+      <p class="hero-copy">
+        Index a repository into a persistent local graph. Query symbols, callers, dependencies,
+        references, and impact without falling back to text-search guesswork.
       </p>
       <div class="hero-actions">
-        <a class="button button-solid" href="{{ get_url(path='docs/getting-started/') }}">Install Cortex</a>
-        <a class="button" href="{{ config.extra.repo }}">Browse the Repo</a>
+        <a class="button button-solid" href="{{ get_url(path='docs/getting-started/') }}">Get Started</a>
+        <a class="button" href="{{ config.extra.repo }}">GitHub</a>
       </div>
-      <div class="hero-proof">
-        <span>Rust monorepo</span>
-        <span>CLI + daemon</span>
-        <span>Rust / JS / TS / Python / Go</span>
-        <span>Persistent local graph store</span>
+      <ul class="hero-points">
+        <li>Local-first and embeddable</li>
+        <li>CLI and HTTP daemon</li>
+        <li>Rust, JS/TS, Python, and Go support</li>
+      </ul>
+    </div>
+    <div class="hero-aside">
+      <div class="callout">
+        <p class="callout-title">Tested on this repo</p>
+        <dl class="metrics-list">
+          <div><dt>Files</dt><dd>{{ config.extra.stats_files }}</dd></div>
+          <div><dt>Symbols</dt><dd>{{ config.extra.stats_symbols }}</dd></div>
+          <div><dt>Edges</dt><dd>{{ config.extra.stats_edges }}</dd></div>
+          <div><dt>Incoming</dt><dd>{{ config.extra.stats_incoming }}</dd></div>
+          <div><dt>Outgoing</dt><dd>{{ config.extra.stats_outgoing }}</dd></div>
+        </dl>
       </div>
-    </div>
-    <div class="hero-stack">
-      <article class="signal-card">
-        <div class="terminal-head">
-          <span class="terminal-dot"></span>
-          <span class="terminal-dot"></span>
-          <span class="terminal-dot"></span>
-          <strong>Live self-hosted run</strong>
-        </div>
-        <pre><code>$ cortex index --repo . --store-path .cortex-readme
-$ cortex query --repo . find-symbol --name RepositorySession
-$ cortex query --repo . callers --target open_session</code></pre>
-        <div class="metrics-grid">
-          <div><span>files</span><strong>{{ config.extra.stats_files }}</strong></div>
-          <div><span>symbols</span><strong>{{ config.extra.stats_symbols }}</strong></div>
-          <div><span>edges</span><strong>{{ config.extra.stats_edges }}</strong></div>
-          <div><span>incoming</span><strong>{{ config.extra.stats_incoming }}</strong></div>
-          <div><span>outgoing</span><strong>{{ config.extra.stats_outgoing }}</strong></div>
-          <div><span>mode</span><strong>local</strong></div>
-        </div>
-      </article>
-      <article class="quote-card">
-        <p class="eyebrow">Why it matters</p>
-        <p>
-          AI tools fail on unfamiliar repositories because they see files, not systems. Cortex gives
-          them a machine-readable map of ownership, calls, and structural blast radius.
-        </p>
-      </article>
-    </div>
-  </section>
-
-  <section class="proof-strip shell">
-    <div>
-      <span>Observed on this repo</span>
-      <strong>`RepositorySession` resolved directly to the core indexer.</strong>
-    </div>
-    <div>
-      <span>Observed on this repo</span>
-      <strong>`open_session` callers surfaced the actual CLI entrypoints.</strong>
-    </div>
-    <div>
-      <span>Observed on this repo</span>
-      <strong>Dependencies exposed the local neighborhood around a core type.</strong>
+      <pre class="hero-code"><code>cortex index --repo .
+cortex query --repo . find-symbol --name RepositorySession
+cortex query --repo . callers --target open_session</code></pre>
     </div>
   </section>
 
   <section class="section shell">
     <div class="section-heading">
-      <p class="eyebrow">What Cortex enables</p>
-      <h2>Use structural context before you edit.</h2>
-      <p>
-        Cortex is most valuable at the moment an agent or engineer needs confidence: before a refactor,
-        before a fix in an unfamiliar subsystem, or before automating changes across multiple files.
-      </p>
+      <p class="eyebrow">What it solves</p>
+      <h2>AI tools need structure, not just text.</h2>
     </div>
-    <div class="feature-grid">
-      <article class="feature-card">
-        <p class="label">Agent context</p>
-        <h3>Give an agent the real shape of a subsystem.</h3>
-        <p>Resolve symbols, trace ownership, and attach architectural context to prompts or automated workflows.</p>
+    <div class="simple-grid">
+      <article>
+        <h3>Find ownership fast</h3>
+        <p>`find-symbol RepositorySession` resolves the actual definition instead of returning every mention.</p>
       </article>
-      <article class="feature-card">
-        <p class="label">Refactor safety</p>
-        <h3>Inspect callers and dependencies before a change lands.</h3>
-        <p>Use structural neighbors as a conservative blast-radius check before touching a symbol or file.</p>
+      <article>
+        <h3>Check callers before edits</h3>
+        <p>`callers open_session` surfaces the CLI entrypoints that really depend on it.</p>
       </article>
-      <article class="feature-card">
-        <p class="label">Architecture discovery</p>
-        <h3>Navigate a repository like a system, not a pile of files.</h3>
-        <p>Surface modules, definitions, references, and relationships without relying on brittle grep loops.</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="section shell split-section">
-    <div class="split-copy">
-      <p class="eyebrow">How it works</p>
-      <h2>A local pipeline with a durable graph at the center.</h2>
-      <ol class="timeline">
-        <li><strong>Parse supported files.</strong> Cortex extracts normalized symbols and relations from Rust, JS/TS, Python, and Go.</li>
-        <li><strong>Materialize the graph.</strong> Files, symbols, and edges become a queryable local knowledge layer.</li>
-        <li><strong>Keep it live.</strong> Index refresh updates the graph so the memory stays aligned with the repository.</li>
-        <li><strong>Query from tools.</strong> The CLI and daemon expose stable query families that agents can consume directly.</li>
-      </ol>
-    </div>
-    <div class="stacked-panels">
-      <article class="info-panel">
-        <p class="label">Current scope</p>
-        <ul class="clean-list">
-          <li>Symbol lookup</li>
-          <li>Dependencies</li>
-          <li>Callers and callees</li>
-          <li>References</li>
-          <li>Conservative impact analysis</li>
-          <li>Explain summaries</li>
-        </ul>
-      </article>
-      <article class="info-panel">
-        <p class="label">Maturity</p>
-        <p>
-          Public OSS beta. Useful for local structural awareness today. Not yet compiler-grade,
-          not yet hardened for autonomous large-scale repo edits.
-        </p>
+      <article>
+        <h3>Estimate blast radius</h3>
+        <p>`dependencies RepositorySession --direction both --depth 1` exposes the nearby structural neighborhood.</p>
       </article>
     </div>
   </section>
 
   <section class="section shell">
-    <div class="section-heading narrow">
-      <p class="eyebrow">Real scenarios</p>
-      <h2>Actual queries you can run right now.</h2>
+    <div class="section-heading">
+      <p class="eyebrow">Quick start</p>
+      <h2>Install the binaries, index a repo, ask better questions.</h2>
     </div>
-    <div class="scenario-grid">
-      <article class="scenario-card">
-        <h3>Find the owner of a core type</h3>
-        <p>Use `find-symbol` when you know a symbol name but not the file that truly defines it.</p>
-        <pre><code>cortex query --repo . find-symbol --name RepositorySession</code></pre>
+    <div class="stack">
+      <article class="code-block">
+        <p class="label">Install from release</p>
+        <pre><code>curl -fsSL https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.sh | sh</code></pre>
       </article>
-      <article class="scenario-card">
-        <h3>Check callers before changing a helper</h3>
-        <p>Use `callers` to see which user-facing flows will feel a local implementation change.</p>
-        <pre><code>cortex query --repo . callers --target open_session</code></pre>
+      <article class="code-block">
+        <p class="label">Or install from source</p>
+        <pre><code>cargo install --path crates/cortex-cli
+cargo install --path crates/cortex-daemon</code></pre>
       </article>
-      <article class="scenario-card">
-        <h3>Inspect structural blast radius</h3>
-        <p>Use `dependencies` when you need the immediate inbound and outbound neighborhood around a type or function.</p>
-        <pre><code>cortex query --repo . dependencies --target RepositorySession --direction both --depth 1</code></pre>
+      <article class="code-block">
+        <p class="label">First useful commands</p>
+        <pre><code>cortex index --repo /path/to/repo
+cortex query --repo /path/to/repo find-symbol --name main
+cortex query --repo /path/to/repo callers --target open_session
+cortexd --repo /path/to/repo --bind 127.0.0.1:8787</code></pre>
       </article>
     </div>
   </section>
 
-  <section class="section shell cta-panel">
-    <div>
-      <p class="eyebrow">Open source and ready to try</p>
-      <h2>Install locally, index a repo, and test whether it improves your agent workflow.</h2>
+  <section class="section shell">
+    <div class="section-heading">
+      <p class="eyebrow">Current scope</p>
+      <h2>Cortex is useful today for structural context and review prep.</h2>
     </div>
-    <div class="cta-actions">
-      <a class="button button-solid" href="{{ get_url(path='docs/getting-started/') }}">Read the quick start</a>
-      <a class="button" href="{{ config.extra.repo }}">Star on GitHub</a>
+    <div class="simple-grid">
+      <article>
+        <h3>Good now</h3>
+        <p>Symbol lookup, call graph discovery, references, dependency inspection, and bounded impact analysis.</p>
+      </article>
+      <article>
+        <h3>Built for integration</h3>
+        <p>Use the local CLI directly or query the daemon from an editor, agent runtime, or automation layer.</p>
+      </article>
+      <article>
+        <h3>Still honest about limits</h3>
+        <p>Current analysis is conservative and syntax-driven. It is not compiler-grade or semantics-complete yet.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section shell final-cta">
+    <div>
+      <p class="eyebrow">Documentation</p>
+      <h2>Read the install guide, query model, and architecture notes.</h2>
+    </div>
+    <div class="hero-actions">
+      <a class="button button-solid" href="{{ get_url(path='docs/getting-started/') }}">Open Docs</a>
+      <a class="button" href="{{ config.extra.repo }}">View Source</a>
     </div>
   </section>
 </main>
