@@ -5,7 +5,7 @@ Cortex is a local-first code intelligence engine for AI agents and developer too
 Website:
 
 - docs and landing: `https://blu3ph4ntom.github.io/cortex/`
-- GitHub Pages custom domain configured: `http://cortex.bluephantom.dev/`
+- custom domain requested: `cortex.bluephantom.dev` can be attached once DNS is pointed at GitHub Pages
 
 ## Why It Is Useful
 
