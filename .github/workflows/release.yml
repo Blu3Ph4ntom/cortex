@@ -20,7 +20,7 @@ jobs:
             artifact_suffix: windows-x86_64
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - name: Build binaries
         run: cargo build --release -p cortex-cli -p cortex-daemon

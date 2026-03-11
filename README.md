@@ -2,6 +2,11 @@
 
 Cortex is a local-first code intelligence engine for AI agents and developer tools. It turns a repository into a persistent semantic graph so tools can ask structural questions about symbols, files, call relationships, and impact instead of guessing with text search.
 
+Website:
+
+- docs and landing: `https://blu3ph4ntom.github.io/cortex/`
+- GitHub Pages custom domain configured: `http://cortex.bluephantom.dev/`
+
 ## Why It Is Useful
 
 When an agent or developer asks questions like:
