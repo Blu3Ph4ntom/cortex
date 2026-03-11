@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="shell docs-shell">
+  <aside class="glass-panel docs-nav">
+    <p class="label">Docs</p>
+    {% set docs = get_section(path="docs/_index.md") %}
+    {% for child in docs.pages %}
+      <a href="{{ child.permalink }}" class="doc-link">{{ child.title }}</a>
+    {% endfor %}
+  </aside>
+  <section class="glass-panel docs-home">
+    <p class="label">Documentation</p>
+    <h1>Minimal docs for a local-first code knowledge engine.</h1>
+    <p>Start with installation, then move into the query model and architecture.</p>
+  </section>
+</main>
+{% endblock content %}

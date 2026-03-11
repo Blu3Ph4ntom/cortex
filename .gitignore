@@ -1,0 +1,9 @@
+/target
+/.cortex
+/.cortex-*
+/.idea
+/.vscode
+*.db
+*.log
+/site/public
+/site/.zola-cache

@@ -1,0 +1,22 @@
+* text=auto eol=lf
+
+*.md linguist-documentation
+*.toml linguist-detectable=false
+*.yml linguist-detectable=false
+*.yaml linguist-detectable=false
+*.html linguist-detectable=false
+*.css linguist-detectable=false
+*.scss linguist-detectable=false
+*.js linguist-detectable=false
+*.svg linguist-detectable=false
+*.png linguist-detectable=false
+*.jpg linguist-detectable=false
+*.jpeg linguist-detectable=false
+*.webp linguist-detectable=false
+*.ps1 linguist-detectable=false
+*.sh linguist-detectable=false
+Cargo.lock linguist-generated=true
+.github/** linguist-generated=true
+docs/** linguist-documentation
+scripts/** linguist-generated=true
+site/** linguist-generated=true

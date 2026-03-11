@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="shell">
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">{{ config.extra.tagline }}</p>
+      <h1>The memory system for AI software engineers.</h1>
+      <p class="lead">
+        Cortex indexes a repository into a live semantic graph so agents can reason about symbols,
+        callers, dependencies, and impact with structural context instead of text-search guesswork.
+      </p>
+      <div class="hero-actions">
+        <a class="button button-solid" href="{{ config.extra.repo }}">View Repository</a>
+        <a class="button" href="{{ get_url(path='docs/') }}">Read Docs</a>
+      </div>
+    </div>
+    <div class="glass-panel hero-panel">
+      <div class="terminal-line">$ cortex index --repo . --store-path .cortex-readme</div>
+      <div class="stats-grid">
+        <div><span>files</span><strong>{{ config.extra.stats_files }}</strong></div>
+        <div><span>symbols</span><strong>{{ config.extra.stats_symbols }}</strong></div>
+        <div><span>edges</span><strong>{{ config.extra.stats_edges }}</strong></div>
+        <div><span>incoming</span><strong>{{ config.extra.stats_incoming }}</strong></div>
+        <div><span>outgoing</span><strong>{{ config.extra.stats_outgoing }}</strong></div>
+        <div><span>mode</span><strong>local</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel-grid">
+    <article class="glass-panel">
+      <p class="label">Observed Benefit</p>
+      <h2>Find the actual owner of a core type</h2>
+      <p>`find-symbol RepositorySession` resolved directly to `crates/cortex-core/src/indexer.rs`.</p>
+    </article>
+    <article class="glass-panel">
+      <p class="label">Observed Benefit</p>
+      <h2>Trace who calls a helper before changing it</h2>
+      <p>`callers open_session` returned `main`, `run_index`, `run_query`, and `run_watch`.</p>
+    </article>
+    <article class="glass-panel">
+      <p class="label">Observed Benefit</p>
+      <h2>Inspect structural blast radius</h2>
+      <p>`dependencies RepositorySession --direction both --depth 1` surfaced real inbound and outbound neighbors.</p>
+    </article>
+  </section>
+
+  <section class="two-up">
+    <div class="glass-panel">
+      <p class="label">Use Cases</p>
+      <ul class="list">
+        <li>Agent pre-edit context for unfamiliar repositories</li>
+        <li>Refactor safety checks before changing a symbol</li>
+        <li>Machine-readable architecture discovery for IDE tooling</li>
+        <li>Local dependency inspection without a hosted service</li>
+      </ul>
+    </div>
+    <div class="glass-panel">
+      <p class="label">What Ships</p>
+      <ul class="list">
+        <li>Rust monorepo</li>
+        <li>Persistent `sled` graph store</li>
+        <li>CLI and daemon interfaces</li>
+        <li>Rust, JS/TS, Python, and Go extractors</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="glass-panel code-showcase">
+    <p class="label">Real Commands</p>
+    <pre><code>cortex index --repo /path/to/repo
+cortex query --repo /path/to/repo find-symbol --name RepositorySession
+cortex query --repo /path/to/repo callers --target open_session
+cortex query --repo /path/to/repo dependencies --target RepositorySession --direction both --depth 1
+cortexd --repo /path/to/repo --bind 127.0.0.1:8787</code></pre>
+  </section>
+</main>
+{% endblock content %}

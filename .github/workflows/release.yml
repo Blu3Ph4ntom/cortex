@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_suffix: linux-x86_64
+          - os: macos-latest
+            artifact_suffix: macos-x86_64
+          - os: windows-latest
+            artifact_suffix: windows-x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build binaries
+        run: cargo build --release -p cortex-cli -p cortex-daemon
+      - name: Package binaries (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir dist
+          cp target/release/cortex dist/
+          cp target/release/cortexd dist/
+          tar -czf cortex-${{ matrix.artifact_suffix }}.tar.gz -C dist cortex cortexd
+      - name: Package binaries (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item target/release/cortex.exe dist/
+          Copy-Item target/release/cortexd.exe dist/
+          Compress-Archive -Path dist/cortex.exe,dist/cortexd.exe -DestinationPath cortex-${{ matrix.artifact_suffix }}.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-${{ matrix.artifact_suffix }}
+          path: |
+            *.tar.gz
+            *.zip

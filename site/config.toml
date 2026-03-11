@@ -1,0 +1,22 @@
+base_url = "https://cortex.bluephantom.dev"
+title = "Cortex"
+description = "A local-first code intelligence engine for AI agents and developer tools."
+compile_sass = false
+build_search_index = true
+generate_feeds = false
+minify_html = true
+
+[markdown]
+render_emoji = false
+smart_punctuation = true
+
+[extra]
+repo = "https://github.com/blu3ph4ntom/cortex"
+docs_repo = "https://github.com/blu3ph4ntom/cortex/tree/main/site"
+domain = "cortex.bluephantom.dev"
+tagline = "Brain for codebases"
+stats_files = 9
+stats_symbols = 165
+stats_edges = 1717
+stats_incoming = 29
+stats_outgoing = 9
