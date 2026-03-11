@@ -1,4 +1,4 @@
-base_url = "https://cortex.bluephantom.dev"
+base_url = "https://blu3ph4ntom.github.io/cortex"
 title = "Cortex"
 description = "A local-first code intelligence engine for AI agents and developer tools."
 compile_sass = false

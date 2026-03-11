@@ -13,9 +13,9 @@
 <body>
   <div class="noise"></div>
   <header class="shell topbar">
-    <a class="brand" href="{{ config.base_url }}">Cortex</a>
+    <a class="brand" href="{{ get_url(path='') }}">Cortex</a>
     <nav class="nav">
-      <a href="{{ config.base_url }}">Home</a>
+      <a href="{{ get_url(path='') }}">Home</a>
       <a href="{{ get_url(path='docs/') }}">Docs</a>
       <a href="{{ config.extra.repo }}">GitHub</a>
     </nav>

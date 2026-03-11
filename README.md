@@ -2,6 +2,13 @@
 
 Cortex is a local-first code intelligence engine for AI agents and developer tools. It turns a repository into a persistent semantic graph so tools can ask structural questions about symbols, files, call relationships, and impact instead of guessing with text search.
 
+Status:
+
+- OSS-ready: yes
+- usable today for local structural analysis and agent context: yes
+- production-ready for broad autonomous code-editing at scale: no, not yet
+- current maturity: beta / foundation-stage
+
 Website:
 
 - docs and landing: `https://blu3ph4ntom.github.io/cortex/`
@@ -72,6 +79,29 @@ That means Cortex is already useful as:
 - Build agent-side tools that need machine-readable code relationships
 - Generate review context for unfamiliar codebases
 - Confirm call paths before refactors or API changes
+
+## Readiness
+
+What is true now:
+
+- the repository is public, documented, buildable, and testable
+- the CLI and daemon are usable by local developers and AI agents
+- the self-test workflow passes on the project itself
+- Pages and CI automation are in place
+
+What is not true yet:
+
+- this is not yet compiler-grade or semantics-complete
+- this is not yet hardened for large-scale autonomous edits across arbitrary repositories
+- there are not yet fixture suites across large real-world polyglot repos
+- there is not yet a stable compatibility policy for query schema evolution
+
+The right framing today is:
+
+- good open-source beta
+- strong foundation for contributors
+- useful for local agent workflows and experimentation
+- not something I would market as fully production-grade code intelligence infrastructure yet
 
 ## What It Is Not Yet
 
