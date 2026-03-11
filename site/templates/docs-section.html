@@ -1,18 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main class="shell docs-shell">
-  <aside class="glass-panel docs-nav">
-    <p class="label">Docs</p>
+<main class="docs-wrap shell">
+  <aside class="docs-sidebar">
+    <p class="eyebrow">Documentation</p>
     {% set docs = get_section(path="docs/_index.md") %}
-    {% for child in docs.pages %}
-      <a href="{{ child.permalink }}" class="doc-link">{{ child.title }}</a>
-    {% endfor %}
+    <nav class="docs-nav">
+      {% for child in docs.pages %}
+        <a href="{{ child.permalink }}" class="doc-link">{{ child.title }}</a>
+      {% endfor %}
+    </nav>
   </aside>
-  <section class="glass-panel docs-home">
-    <p class="label">Documentation</p>
-    <h1>Minimal docs for a local-first code knowledge engine.</h1>
-    <p>Start with installation, then move into the query model and architecture.</p>
+  <section class="docs-landing">
+    <p class="eyebrow">Docs</p>
+    <h1>Everything you need to install Cortex, query a repository, and understand the current architecture.</h1>
+    <p class="docs-intro">
+      Start with the local install and first index, then move into query semantics and implementation shape.
+      The documentation stays honest about current limits: useful today, conservative by design, still early.
+    </p>
+    <div class="docs-card-grid">
+      {% for child in docs.pages %}
+        <a class="docs-card" href="{{ child.permalink }}">
+          <span class="label">{{ child.title }}</span>
+          <strong>{{ child.description | default(value=child.title) }}</strong>
+        </a>
+      {% endfor %}
+    </div>
   </section>
 </main>
 {% endblock content %}

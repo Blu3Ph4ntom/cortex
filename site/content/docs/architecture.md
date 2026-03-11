@@ -1,6 +1,7 @@
 +++
 title = "Architecture"
 weight = 3
+description = "Understand the Rust monorepo, the indexing pipeline, and the graph shape Cortex serves today."
 +++
 
 # Architecture
@@ -47,4 +48,17 @@ Edges:
 - depends_on
 - owned_by
 
-This is enough to be useful for navigation, review context, and bounded impact analysis.
+## Design Intent
+
+The project is deliberately local-first:
+
+- no external graph database
+- no hosted dependency
+- no cloud control plane
+- no multi-repo global model in v1
+
+The goal is to make structural repository memory cheap to run beside an AI agent or editor.
+
+## Current Tradeoff
+
+Today’s implementation prioritizes deterministic structural usefulness over semantic completeness. That means the graph is good for navigation, review context, and bounded impact analysis, while deeper compiler-grade guarantees remain future work.
