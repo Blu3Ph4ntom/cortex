@@ -1,0 +1,330 @@
+{
+    "generated_at":  "2026-03-12T09:28:53Z",
+    "commit":  "30ce799",
+    "summary":  {
+                    "repo_count":  5,
+                    "scenario_count":  6,
+                    "corpus_files":  341,
+                    "corpus_symbols":  4675,
+                    "corpus_edges":  42140,
+                    "total_cortex_results":  10,
+                    "total_baseline_hits":  338,
+                    "total_baseline_files":  70,
+                    "overall_candidate_reduction":  33.8
+                },
+    "methodology":  {
+                        "benchmark_host":  "DESKTOP-CMRQRJV",
+                        "cold_index_iterations":  3,
+                        "warm_query_iterations":  7,
+                        "baseline_iterations":  7,
+                        "baseline":  "git grep -n -w",
+                        "binary":  "target/release/cortex.exe",
+                        "note":  "Cold index medians come from fresh stores. Query medians reuse a warm local store and are compared against raw repo text search."
+                    },
+    "repos":  [
+                  {
+                      "key":  "cortex",
+                      "name":  "Cortex",
+                      "language":  "Rust",
+                      "repo_path":  "A:\\Projects\\cortex",
+                      "index_median_ms":  175.13,
+                      "index_run_ms":  [
+                                           175.13,
+                                           101.13,
+                                           98.42
+                                       ],
+                      "file_count":  11,
+                      "symbol_count":  249,
+                      "edge_count":  2364,
+                      "query_store_path":  "A:\\\\Projects\\\\cortex-fieldtests\\benchstores\\\\runs\\cortex-active"
+                  },
+                  {
+                      "key":  "mini_redis",
+                      "name":  "mini-redis",
+                      "language":  "Rust",
+                      "repo_path":  "A:\\\\Projects\\\\cortex-fieldtests\\mini-redis",
+                      "index_median_ms":  104.74,
+                      "index_run_ms":  [
+                                           104.74,
+                                           76.54,
+                                           75.93
+                                       ],
+                      "file_count":  27,
+                      "symbol_count":  249,
+                      "edge_count":  2254,
+                      "query_store_path":  "A:\\\\Projects\\\\cortex-fieldtests\\benchstores\\\\runs\\mini_redis-active"
+                  },
+                  {
+                      "key":  "requests",
+                      "name":  "requests",
+                      "language":  "Python",
+                      "repo_path":  "A:\\\\Projects\\\\cortex-fieldtests\\requests",
+                      "index_median_ms":  170.81,
+                      "index_run_ms":  [
+                                           169.61,
+                                           168.65,
+                                           170.81
+                                       ],
+                      "file_count":  36,
+                      "symbol_count":  759,
+                      "edge_count":  5373,
+                      "query_store_path":  "A:\\\\Projects\\\\cortex-fieldtests\\benchstores\\\\runs\\requests-active"
+                  },
+                  {
+                      "key":  "chi",
+                      "name":  "chi",
+                      "language":  "Go",
+                      "repo_path":  "A:\\\\Projects\\\\cortex-fieldtests\\chi",
+                      "index_median_ms":  206.96,
+                      "index_run_ms":  [
+                                           206.96,
+                                           203.27,
+                                           201.49
+                                       ],
+                      "file_count":  74,
+                      "symbol_count":  433,
+                      "edge_count":  5809,
+                      "query_store_path":  "A:\\\\Projects\\\\cortex-fieldtests\\benchstores\\\\runs\\chi-active"
+                  },
+                  {
+                      "key":  "axios",
+                      "name":  "axios",
+                      "language":  "JavaScript",
+                      "repo_path":  "A:\\\\Projects\\\\cortex-fieldtests\\axios",
+                      "index_median_ms":  581.43,
+                      "index_run_ms":  [
+                                           581.43,
+                                           537.63,
+                                           543.15
+                                       ],
+                      "file_count":  193,
+                      "symbol_count":  2985,
+                      "edge_count":  26340,
+                      "query_store_path":  "A:\\\\Projects\\\\cortex-fieldtests\\benchstores\\\\runs\\axios-active"
+                  }
+              ],
+    "scenarios":  [
+                      {
+                          "key":  "cortex-owner",
+                          "repo_key":  "cortex",
+                          "repo_name":  "Cortex",
+                          "language":  "Rust",
+                          "label":  "Resolve RepositorySession owner",
+                          "query_kind":  "find_symbol",
+                          "target":  "RepositorySession",
+                          "cortex_median_ms":  40.4,
+                          "cortex_run_ms":  [
+                                                52.91,
+                                                41.03,
+                                                39.48,
+                                                40.13,
+                                                40.4,
+                                                39.5,
+                                                39.08
+                                            ],
+                          "cortex_result_count":  1,
+                          "cortex_answer":  "crates\\cortex-core\\src\\indexer.rs:38",
+                          "cortex_output_chars":  459,
+                          "baseline_tool":  "git grep -n -w",
+                          "baseline_median_ms":  40.98,
+                          "baseline_run_ms":  [
+                                                  42.04,
+                                                  39.86,
+                                                  38.66,
+                                                  39.85,
+                                                  38.7,
+                                                  43.06,
+                                                  40.98
+                                              ],
+                          "baseline_hit_count":  45,
+                          "baseline_file_count":  10,
+                          "baseline_output_chars":  4723,
+                          "candidate_reduction_factor":  45
+                      },
+                      {
+                          "key":  "cortex-callers",
+                          "repo_key":  "cortex",
+                          "repo_name":  "Cortex",
+                          "language":  "Rust",
+                          "label":  "Trace open_session callers",
+                          "query_kind":  "callers",
+                          "target":  "open_session",
+                          "cortex_median_ms":  40.44,
+                          "cortex_run_ms":  [
+                                                42.61,
+                                                39.86,
+                                                40.65,
+                                                39.47,
+                                                40.26,
+                                                39.03,
+                                                40.44
+                                            ],
+                          "cortex_result_count":  4,
+                          "cortex_answer":  "main, run_index, run_query, run_watch",
+                          "cortex_output_chars":  4718,
+                          "baseline_tool":  "git grep -n -w",
+                          "baseline_median_ms":  41.71,
+                          "baseline_run_ms":  [
+                                                  42.24,
+                                                  39.34,
+                                                  39.53,
+                                                  43.38,
+                                                  41.71,
+                                                  41.6,
+                                                  39.83
+                                              ],
+                          "baseline_hit_count":  21,
+                          "baseline_file_count":  6,
+                          "baseline_output_chars":  2152,
+                          "candidate_reduction_factor":  5.25
+                      },
+                      {
+                          "key":  "requests-owner",
+                          "repo_key":  "requests",
+                          "repo_name":  "requests",
+                          "language":  "Python",
+                          "label":  "Resolve requests.Session owner",
+                          "query_kind":  "find_symbol",
+                          "target":  "Session",
+                          "cortex_median_ms":  65.38,
+                          "cortex_run_ms":  [
+                                                79.02,
+                                                65.38,
+                                                66.8,
+                                                62.81,
+                                                63.56,
+                                                63.27,
+                                                62.04
+                                            ],
+                          "cortex_result_count":  1,
+                          "cortex_answer":  "src\\requests\\sessions.py:357",
+                          "cortex_output_chars":  459,
+                          "baseline_tool":  "git grep -n -w",
+                          "baseline_median_ms":  41.33,
+                          "baseline_run_ms":  [
+                                                  42.35,
+                                                  44.58,
+                                                  41.33,
+                                                  39.73,
+                                                  40.5,
+                                                  40.39,
+                                                  40.42
+                                              ],
+                          "baseline_hit_count":  140,
+                          "baseline_file_count":  10,
+                          "baseline_output_chars":  10023,
+                          "candidate_reduction_factor":  140
+                      },
+                      {
+                          "key":  "mini-redis-callers",
+                          "repo_key":  "mini_redis",
+                          "repo_name":  "mini-redis",
+                          "language":  "Rust",
+                          "label":  "Trace read_frame callers",
+                          "query_kind":  "callers",
+                          "target":  "read_frame",
+                          "cortex_median_ms":  39.83,
+                          "cortex_run_ms":  [
+                                                53.31,
+                                                39.84,
+                                                38.97,
+                                                38.88,
+                                                38.42,
+                                                39.83,
+                                                39.48
+                                            ],
+                          "cortex_result_count":  2,
+                          "cortex_answer":  "next_message, read_response",
+                          "cortex_output_chars":  2872,
+                          "baseline_tool":  "git grep -n -w",
+                          "baseline_median_ms":  38.29,
+                          "baseline_run_ms":  [
+                                                  38.29,
+                                                  37.82,
+                                                  37.25,
+                                                  38.71,
+                                                  36.26,
+                                                  37.85,
+                                                  38.4
+                                              ],
+                          "baseline_hit_count":  7,
+                          "baseline_file_count":  4,
+                          "baseline_output_chars":  588,
+                          "candidate_reduction_factor":  3.5
+                      },
+                      {
+                          "key":  "chi-owner",
+                          "repo_key":  "chi",
+                          "repo_name":  "chi",
+                          "language":  "Go",
+                          "label":  "Resolve chi.NewRouter owner",
+                          "query_kind":  "find_symbol",
+                          "target":  "NewRouter",
+                          "cortex_median_ms":  70.33,
+                          "cortex_run_ms":  [
+                                                81.64,
+                                                70.93,
+                                                69.88,
+                                                66.71,
+                                                70.12,
+                                                70.33,
+                                                68.15
+                                            ],
+                          "cortex_result_count":  1,
+                          "cortex_answer":  "chi.go:60",
+                          "cortex_output_chars":  415,
+                          "baseline_tool":  "git grep -n -w",
+                          "baseline_median_ms":  39.38,
+                          "baseline_run_ms":  [
+                                                  39.38,
+                                                  37.64,
+                                                  39.89,
+                                                  39.25,
+                                                  38.6,
+                                                  40.54,
+                                                  38.95
+                                              ],
+                          "baseline_hit_count":  120,
+                          "baseline_file_count":  37,
+                          "baseline_output_chars":  6363,
+                          "candidate_reduction_factor":  120
+                      },
+                      {
+                          "key":  "axios-owner",
+                          "repo_key":  "axios",
+                          "repo_name":  "axios",
+                          "language":  "JavaScript",
+                          "label":  "Resolve axios.dispatchRequest owner",
+                          "query_kind":  "find_symbol",
+                          "target":  "dispatchRequest",
+                          "cortex_median_ms":  188.2,
+                          "cortex_run_ms":  [
+                                                181.97,
+                                                167.36,
+                                                162.19,
+                                                186.57,
+                                                189.76,
+                                                188.2,
+                                                202.55
+                                            ],
+                          "cortex_result_count":  1,
+                          "cortex_answer":  "lib\\core\\dispatchRequest.js:34",
+                          "cortex_output_chars":  491,
+                          "baseline_tool":  "git grep -n -w",
+                          "baseline_median_ms":  43.29,
+                          "baseline_run_ms":  [
+                                                  43.98,
+                                                  43.24,
+                                                  41.52,
+                                                  43.11,
+                                                  43.48,
+                                                  42.51,
+                                                  43.29
+                                              ],
+                          "baseline_hit_count":  5,
+                          "baseline_file_count":  3,
+                          "baseline_output_chars":  431,
+                          "candidate_reduction_factor":  5
+                      }
+                  ]
+}

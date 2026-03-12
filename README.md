@@ -1,60 +1,68 @@
 # Cortex
 
-Cortex is a local-first code knowledge engine for AI agents and developer tools.
+Cortex is a local-first code knowledge engine for coding agents and developer tools.
 
 It indexes a repository into a persistent semantic graph so tools can ask structural questions like:
 
 - what defines this symbol?
 - what calls this function?
 - what depends on this type?
-- what might break if I change this file?
+- what is the likely blast radius of a change?
 
-Instead of treating code as raw text, Cortex exposes machine-readable structure through a CLI and a local HTTP daemon.
+The goal is not “AI code search.” The goal is giving agents a reusable structural memory layer instead of forcing every task through raw text search and guesswork.
 
-## What Cortex Does
+## Why use it
 
-- indexes Rust, JavaScript, TypeScript, Python, and Go repositories
-- persists a local graph in `sled`
-- serves typed queries for symbols, dependencies, callers, callees, references, impact, and explain summaries
-- supports local re-indexing and refresh
-- ships as a Rust monorepo with:
-  - `cortex`: CLI
-  - `cortexd`: local daemon
+Text search is a poor interface for structural reasoning. Grep can tell you that a name appears in many places; it cannot tell you which definition is canonical, which callers are relevant, or which neighbors form the local dependency neighborhood.
 
-## Status
+Cortex is useful when an agent or developer needs:
 
-Cortex is usable today for local structural awareness, agent context building, and pre-refactor analysis.
+- symbol ownership before editing an unfamiliar codebase
+- callers and dependencies before a refactor
+- a bounded impact estimate before changing behavior
+- machine-readable structure for local tools and automations
 
-Current maturity:
+## What ships today
 
-- public OSS beta
-- useful for local developer and agent workflows
-- not yet compiler-grade or semantics-complete
-- not yet hardened for large-scale autonomous editing across arbitrary repositories
+- `cortex`: local CLI
+- `cortexd`: local HTTP daemon
+- `cortex-core`: Rust library with indexer, graph store, extractors, and query engine
+- first-party extractors for Rust, JavaScript/TypeScript, Python, and Go
+- typed queries for `find-symbol`, `dependencies`, `callers`, `callees`, `references`, `impact`, and `explain`
+- a public agent-facing [`SKILL.md`](./SKILL.md)
+- reproducible benchmark artifacts in [`benchmarks/latest.md`](./benchmarks/latest.md) and [`benchmarks/latest.json`](./benchmarks/latest.json)
 
-## Why Use It
+## Benchmark snapshot
 
-Text search is a poor interface for structural reasoning. Cortex is useful when an agent or developer needs repository context before changing code.
+The current benchmark artifact was generated with the release binary on this machine using [`scripts/benchmark.ps1`](./scripts/benchmark.ps1). It compares Cortex against a raw text-search baseline: `git grep -n -w`.
 
-Examples from this repository:
+Benchmark corpus:
 
-- `find-symbol RepositorySession` resolves the actual owner of a core type
-- `callers open_session` surfaces the CLI entrypoints that depend on it
-- `dependencies RepositorySession --direction both --depth 1` exposes the nearby structural neighborhood
+- `5` repositories
+- `341` files
+- `4,675` symbols
+- `42,140` edges
+- `6` structural scenarios
 
-Measured self-host results on this repository:
+Headline result:
 
-- files indexed: `9`
-- symbols indexed: `165`
-- edges indexed: `1717`
-- `RepositorySession` explain summary: `29` incoming edges, `9` outgoing edges
+- Cortex narrowed `338` raw grep hits across `70` files down to `10` structured graph results
+- overall search-surface reduction: `33.8x`
 
-Additional field tests run during this release pass:
+What that means in practice:
 
-- `tokio-rs/mini-redis`: `27` files, `249` symbols, `2254` edges; `Connection` resolved to `src/connection.rs:21`, and `read_frame` surfaced `2` concrete callers
-- `psf/requests`: `36` files, `759` symbols, `5373` edges; `Session` resolved to `src/requests/sessions.py:357`, with `58` impacted nodes at depth `1`
-- `go-chi/chi`: `74` files, `433` symbols, `5809` edges; `NewRouter` resolved to `chi.go:60`, with `84` impacted nodes at depth `1`
-- `axios/axios`: `193` files, `2985` symbols, `26340` edges; `dispatchRequest` resolved to `lib/core/dispatchRequest.js:34`, with impact pointing back to `Axios::_request`
+- `requests.Session`: Cortex returned `1` owner candidate at `src/requests/sessions.py:357`; grep returned `140` hits
+- `chi.NewRouter`: Cortex returned `1` owner candidate at `chi.go:60`; grep returned `120` hits across `37` files
+- `RepositorySession` in Cortex itself: Cortex returned `1` owner candidate at `crates/cortex-core/src/indexer.rs:38`; grep returned `45` hits
+- `open_session` in Cortex itself: Cortex returned `4` real callers; grep returned `21` raw hits
+
+Latency notes:
+
+- cold index medians in the current benchmark set range from `104.74 ms` (`mini-redis`) to `581.43 ms` (`axios`)
+- warm query medians range from `39.83 ms` to `188.2 ms`
+- raw grep is often faster to start, but it returns unranked line hits instead of a structural answer
+
+This is the right way to read the benchmark: Cortex is not trying to beat grep on “find bytes in files.” It is trying to reduce the amount of irrelevant text an agent has to inspect to answer a structural question.
 
 ## Installation
 
@@ -69,10 +77,10 @@ curl -fsSL https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/ins
 PowerShell:
 
 ```powershell
-iwr https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.ps1 -useb | iex
+irm https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.ps1 | iex
 ```
 
-By default, the installer places binaries in:
+Default install locations:
 
 - Unix: `~/.local/bin`
 - Windows: `$HOME\.cortex\bin`
@@ -80,13 +88,15 @@ By default, the installer places binaries in:
 ### Install from source
 
 ```bash
+git clone https://github.com/Blu3Ph4ntom/cortex.git
+cd cortex
 cargo install --path crates/cortex-cli
 cargo install --path crates/cortex-daemon
 ```
 
 On Windows, prefer the MSVC toolchain if the GNU toolchain does not provide `gcc.exe` and `dlltool.exe`.
 
-## Quick Start
+## Quick start
 
 Index a repository:
 
@@ -94,22 +104,23 @@ Index a repository:
 cortex index --repo /path/to/repo
 ```
 
-Find a symbol:
+Resolve a symbol owner:
 
 ```bash
-cortex query --repo /path/to/repo find-symbol --name RepositorySession
+cortex query --repo /path/to/repo find-symbol --name PaymentService
 ```
 
 Check callers before a change:
 
 ```bash
-cortex query --repo /path/to/repo callers --target open_session
+cortex query --repo /path/to/repo callers --target update_status
 ```
 
-Inspect dependencies:
+Inspect dependencies and blast radius:
 
 ```bash
-cortex query --repo /path/to/repo dependencies --target RepositorySession --direction both --depth 1
+cortex query --repo /path/to/repo dependencies --target PaymentService --direction both --depth 1
+cortex query --repo /path/to/repo impact --target update_status --depth 1
 ```
 
 Run the daemon:
@@ -118,18 +129,66 @@ Run the daemon:
 cortexd --repo /path/to/repo --bind 127.0.0.1:8787
 ```
 
-## Agent Skill
+## Agent skill
 
-`SKILL.md` is the agent-facing usage guide for applying Cortex to an arbitrary repository.
+Cortex ships an agent-facing [`SKILL.md`](./SKILL.md) for use on arbitrary repositories.
 
-Use it when an agent needs to:
+Install that skill into a compatible runtime:
+
+```bash
+npx skills add https://github.com/Blu3Ph4ntom/cortex --skill cortex
+```
+
+Direct skill URLs:
+
+- GitHub: <https://github.com/Blu3Ph4ntom/cortex/blob/main/SKILL.md>
+- Raw: <https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/SKILL.md>
+
+What the skill is for:
 
 - resolve the real owner of a symbol
 - inspect callers before changing behavior
-- trace local dependency neighborhood
+- trace the local dependency neighborhood
 - estimate conservative blast radius before editing
 
-`AGENTS.md` is different: it contains contributor instructions specific to the Cortex repository itself.
+`AGENTS.md` is different. It contains contributor instructions specific to working on the Cortex repository itself.
+
+## Field-tested repositories
+
+These runs were executed directly with Cortex during this release pass:
+
+- `Cortex` self-host: `11` files, `249` symbols, `2,364` edges; `RepositorySession` resolved to `crates/cortex-core/src/indexer.rs:38`; `open_session` impact returned `4` nodes and `12` supporting edges
+- `tokio-rs/mini-redis`: `27` files, `249` symbols, `2,254` edges; `Connection` resolved to `src/connection.rs:21`; `read_frame` surfaced `2` concrete callers
+- `psf/requests`: `36` files, `759` symbols, `5,373` edges; `Session` resolved to `src/requests/sessions.py:357`; impact returned `58` nodes and `116` supporting edges
+- `go-chi/chi`: `74` files, `433` symbols, `5,809` edges; `NewRouter` resolved to `chi.go:60`; impact returned `84` nodes and `252` supporting edges
+- `axios/axios`: `193` files, `2,985` symbols, `26,340` edges; `dispatchRequest` resolved to `lib/core/dispatchRequest.js:34`; impact connected it back to `Axios::_request`
+
+## Benchmarking Cortex yourself
+
+Build the release binary first:
+
+```bash
+cargo build --release
+```
+
+Then run the benchmark harness:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\benchmark.ps1
+```
+
+Outputs:
+
+- [`benchmarks/latest.md`](./benchmarks/latest.md): human-readable benchmark report
+- [`benchmarks/latest.json`](./benchmarks/latest.json): machine-readable benchmark data
+- [`site/data/benchmarks.json`](./site/data/benchmarks.json): website data source
+
+Current methodology:
+
+- cold index medians come from fresh stores
+- warm query medians reuse a prepared local store
+- the baseline is `git grep -n -w`
+- the benchmark focuses on structural tasks, not byte-search throughput
 
 ## HTTP API
 
@@ -151,12 +210,13 @@ Example:
 curl "http://127.0.0.1:8787/graph/find_symbol?name=RepositorySession"
 ```
 
-## Repository Layout
+## Repository layout
 
 - `crates/cortex-core`: graph model, indexer, extractors, storage, and query engine
 - `crates/cortex-cli`: CLI entrypoint and query commands
 - `crates/cortex-daemon`: local HTTP server for tool integrations
 - `site/`: Zola landing page and docs
+- `benchmarks/`: generated benchmark artifacts
 
 ## Development
 
@@ -168,16 +228,21 @@ cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all-targets
 ```
 
-Windows self-test:
+Self-test:
 
 ```powershell
-./scripts/self-test.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1
 ```
 
-## Limitations
+## Status and limitations
 
-- analysis is intentionally conservative and syntax-driven
+Cortex is useful today for local structural awareness and agent workflows. It is still OSS beta software.
+
+Current limits:
+
+- analysis is conservative and syntax-driven
 - import and reference resolution are best-effort, not compiler-grade
+- runtime data flow and dynamic dispatch still need manual confirmation
 - the embedded store is single-writer; use `--store-path` for isolated concurrent runs
 - current strength is structural context, not full semantic truth
 
