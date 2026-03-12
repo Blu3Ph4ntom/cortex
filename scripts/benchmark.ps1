@@ -17,7 +17,7 @@ function Get-Median {
         return 0
     }
 
-    $sorted = @($Values | Sort-Object)
+    $sorted = @($Values | ForEach-Object { [double]$_ } | Sort-Object { $_ })
     $count = $sorted.Count
     if ($count % 2 -eq 1) {
         return [math]::Round($sorted[[int]($count / 2)], 2)

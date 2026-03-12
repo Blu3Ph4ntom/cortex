@@ -39,27 +39,27 @@ The current benchmark artifact was generated with the release binary on this mac
 Benchmark corpus:
 
 - `5` repositories
-- `341` files
-- `4,675` symbols
-- `42,140` edges
+- `343` files
+- `4,749` symbols
+- `42,690` edges
 - `6` structural scenarios
 
 Headline result:
 
-- Cortex narrowed `338` raw grep hits across `70` files down to `10` structured graph results
-- overall search-surface reduction: `33.8x`
+- Cortex narrowed `349` raw grep hits across `78` files down to `10` structured graph results
+- overall search-surface reduction: `34.9x`
 
 What that means in practice:
 
 - `requests.Session`: Cortex returned `1` owner candidate at `src/requests/sessions.py:357`; grep returned `140` hits
 - `chi.NewRouter`: Cortex returned `1` owner candidate at `chi.go:60`; grep returned `120` hits across `37` files
-- `RepositorySession` in Cortex itself: Cortex returned `1` owner candidate at `crates/cortex-core/src/indexer.rs:38`; grep returned `45` hits
-- `open_session` in Cortex itself: Cortex returned `4` real callers; grep returned `21` raw hits
+- `RepositorySession` in Cortex itself: Cortex returned `1` owner candidate at `crates/cortex-core/src/indexer.rs:38`; grep returned `49` hits
+- `open_session` in Cortex itself: Cortex returned `4` real callers; grep returned `28` raw hits
 
 Latency notes:
 
-- cold index medians in the current benchmark set range from `104.74 ms` (`mini-redis`) to `581.43 ms` (`axios`)
-- warm query medians range from `39.83 ms` to `188.2 ms`
+- cold index medians in the current benchmark set range from `147.67 ms` (`mini-redis`) to `777.7 ms` (`axios`)
+- warm query medians range from `45.41 ms` to `180.34 ms`
 - raw grep is often faster to start, but it returns unranked line hits instead of a structural answer
 
 This is the right way to read the benchmark: Cortex is not trying to beat grep on “find bytes in files.” It is trying to reduce the amount of irrelevant text an agent has to inspect to answer a structural question.
@@ -157,7 +157,7 @@ What the skill is for:
 
 These runs were executed directly with Cortex during this release pass:
 
-- `Cortex` self-host: `11` files, `249` symbols, `2,364` edges; `RepositorySession` resolved to `crates/cortex-core/src/indexer.rs:38`; `open_session` impact returned `4` nodes and `12` supporting edges
+- `Cortex` self-host: `13` files, `323` symbols, `2,914` edges; `RepositorySession` resolved to `crates/cortex-core/src/indexer.rs:38`; `open_session` impact returned `4` nodes and `12` supporting edges
 - `tokio-rs/mini-redis`: `27` files, `249` symbols, `2,254` edges; `Connection` resolved to `src/connection.rs:21`; `read_frame` surfaced `2` concrete callers
 - `psf/requests`: `36` files, `759` symbols, `5,373` edges; `Session` resolved to `src/requests/sessions.py:357`; impact returned `58` nodes and `116` supporting edges
 - `go-chi/chi`: `74` files, `433` symbols, `5,809` edges; `NewRouter` resolved to `chi.go:60`; impact returned `84` nodes and `252` supporting edges
