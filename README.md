@@ -49,6 +49,13 @@ Measured self-host results on this repository:
 - edges indexed: `1717`
 - `RepositorySession` explain summary: `29` incoming edges, `9` outgoing edges
 
+Additional field tests run during this release pass:
+
+- `tokio-rs/mini-redis`: `27` files, `249` symbols, `2254` edges; `Connection` resolved to `src/connection.rs:21`, and `read_frame` surfaced `2` concrete callers
+- `psf/requests`: `36` files, `759` symbols, `5373` edges; `Session` resolved to `src/requests/sessions.py:357`, with `58` impacted nodes at depth `1`
+- `go-chi/chi`: `74` files, `433` symbols, `5809` edges; `NewRouter` resolved to `chi.go:60`, with `84` impacted nodes at depth `1`
+- `axios/axios`: `193` files, `2985` symbols, `26340` edges; `dispatchRequest` resolved to `lib/core/dispatchRequest.js:34`, with impact pointing back to `Axios::_request`
+
 ## Installation
 
 ### Install a release binary
@@ -110,6 +117,19 @@ Run the daemon:
 ```bash
 cortexd --repo /path/to/repo --bind 127.0.0.1:8787
 ```
+
+## Agent Skill
+
+`SKILL.md` is the agent-facing usage guide for applying Cortex to an arbitrary repository.
+
+Use it when an agent needs to:
+
+- resolve the real owner of a symbol
+- inspect callers before changing behavior
+- trace local dependency neighborhood
+- estimate conservative blast radius before editing
+
+`AGENTS.md` is different: it contains contributor instructions specific to the Cortex repository itself.
 
 ## HTTP API
 

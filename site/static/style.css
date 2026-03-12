@@ -242,12 +242,12 @@ body {
 }
 
 h1 {
-    font-size: clamp(2.1rem, 4.3vw, 3rem);
-    line-height: 1.03;
+    font-size: clamp(2.6rem, 4vw, 3.35rem);
+    line-height: 0.98;
     margin: 0 0 24px;
     font-weight: 800;
     letter-spacing: -0.03em;
-    max-width: 13ch;
+    max-width: 15.5ch;
 }
 
 .lede,
@@ -387,14 +387,6 @@ h3 {
     position: relative;
 }
 
-.metric-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
-    margin: 8px 0 20px;
-}
-
-.metric-card,
 .fact-item {
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -402,7 +394,6 @@ h3 {
     padding: 18px 20px;
 }
 
-.metric-card span,
 .fact-item span {
     display: block;
     font-size: 10px;
@@ -411,13 +402,6 @@ h3 {
     letter-spacing: 0.1em;
     margin-bottom: 10px;
     opacity: 0.5;
-}
-
-.metric-card strong {
-    display: block;
-    font-size: 1.3rem;
-    line-height: 1.1;
-    font-weight: 700;
 }
 
 .fact-list {
@@ -437,6 +421,44 @@ h3 {
     white-space: pre;
     overflow-x: auto;
     padding-bottom: 2px;
+}
+
+.repo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.repo-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--code-bg);
+    padding: 18px 20px;
+}
+
+.repo-card span {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+.repo-card strong {
+    display: block;
+    font-size: 1rem;
+    line-height: 1.35;
+    margin-bottom: 10px;
+}
+
+.repo-card p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
+    opacity: 0.76;
 }
 
 .quick .cmd:hover {
@@ -597,5 +619,9 @@ pre:hover .copy-btn {
 
     .metric-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .repo-grid {
+        grid-template-columns: 1fr;
     }
 }

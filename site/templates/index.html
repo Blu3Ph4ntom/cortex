@@ -37,6 +37,8 @@
       <a href="#quickstart" data-section="quickstart"><span class="nav-text">Quick start</span></a>
       <a href="#agent-workflows" data-section="agent-workflows"><span class="nav-text">Agent workflows</span></a>
       <a href="#queries" data-section="queries"><span class="nav-text">Query model</span></a>
+      <a href="#skill" data-section="skill"><span class="nav-text">Skill</span></a>
+      <a href="#field-tested" data-section="field-tested"><span class="nav-text">Field tested</span></a>
       <a href="#daemon" data-section="daemon"><span class="nav-text">Daemon API</span></a>
       <a href="#architecture" data-section="architecture"><span class="nav-text">Architecture</span></a>
       <a href="#contributing" data-section="contributing"><span class="nav-text">Contributing</span></a>
@@ -64,7 +66,7 @@
   <div class="page">
     <section id="overview" class="panel-section is-active" aria-labelledby="overview-heading">
       <div class="panel-body">
-        <h1 id="overview-heading">Codebase memory for agents.</h1>
+        <h1 id="overview-heading">Structural context for real codebases.</h1>
         <p class="lede">Cortex is a local-first code knowledge engine that turns a repository into a persistent semantic graph so agents can resolve symbol ownership, inspect callers, trace dependencies, and estimate impact with structural context instead of grep and guesswork.</p>
 
         <div class="cta">
@@ -88,37 +90,6 @@
           <div class="feature-item">
             <h4>CLI and daemon</h4>
             <p>Use the CLI directly or expose the graph through a local HTTP daemon for agents, editors, and automation flows.</p>
-          </div>
-        </div>
-
-        <h3>Validated on this repository</h3>
-        <div class="metric-grid">
-          <div class="metric-card">
-            <span>Files</span>
-            <strong>{{ config.extra.stats_files }}</strong>
-          </div>
-          <div class="metric-card">
-            <span>Symbols</span>
-            <strong>{{ config.extra.stats_symbols }}</strong>
-          </div>
-          <div class="metric-card">
-            <span>Edges</span>
-            <strong>{{ config.extra.stats_edges }}</strong>
-          </div>
-          <div class="metric-card">
-            <span>Incoming / Outgoing</span>
-            <strong>{{ config.extra.stats_incoming }} / {{ config.extra.stats_outgoing }}</strong>
-          </div>
-        </div>
-
-        <div class="fact-list">
-          <div class="fact-item">
-            <span>Observed result</span>
-            <p><code>find-symbol RepositorySession</code> resolves directly to <code>crates/cortex-core/src/indexer.rs</code>.</p>
-          </div>
-          <div class="fact-item">
-            <span>Observed result</span>
-            <p><code>callers open_session</code> surfaces the CLI entrypoints that depend on it before a refactor.</p>
           </div>
         </div>
       </div>
@@ -202,6 +173,71 @@ cortex query --repo /path/to/repo dependencies --target RepositorySession --dire
       </div>
       <div class="section-footer">
         <a class="edit-link external" href="{{ config.extra.docs_repo }}/README.md" rel="noopener" target="_blank">Edit on GitHub</a>
+      </div>
+    </section>
+
+    <section id="skill" class="panel-section" aria-labelledby="skill-heading">
+      <div class="panel-body">
+        <h2 id="skill-heading">Skill</h2>
+        <p>Cortex ships a reusable <code>SKILL.md</code> for coding agents. It is meant for agents working in arbitrary repositories, not for contributors editing Cortex itself.</p>
+        <div class="grid">
+          <div>
+            <h3>Recommended agent loop</h3>
+            <pre><code>cortex index --repo /path/to/repo
+cortex query --repo /path/to/repo find-symbol --name PaymentService
+cortex query --repo /path/to/repo callers --target update_status
+cortex query --repo /path/to/repo impact --target update_status --depth 1</code></pre>
+          </div>
+          <div>
+            <h3>What the skill tells an agent</h3>
+            <ul>
+              <li>use Cortex before broad grep when structural context matters</li>
+              <li>quote resolved file paths and spans in reasoning</li>
+              <li>treat results as conservative, not compiler-grade proof</li>
+              <li>fall back to manual reading when dynamic behavior is uncertain</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.repo }}/blob/main/SKILL.md" rel="noopener" target="_blank">View SKILL.md</a>
+      </div>
+    </section>
+
+    <section id="field-tested" class="panel-section" aria-labelledby="field-tested-heading">
+      <div class="panel-body">
+        <h2 id="field-tested-heading">Field tested</h2>
+        <p>These are actual Cortex runs executed during this build pass against real repositories in the supported language set.</p>
+        <div class="repo-grid">
+          <div class="repo-card">
+            <span>Rust / Cortex</span>
+            <strong>11 files / 249 symbols / 2364 edges</strong>
+            <p><code>RepositorySession</code> resolved to <code>crates/cortex-core/src/indexer.rs:38</code>. <code>open_session</code> impact returned 4 nodes with 12 supporting edges.</p>
+          </div>
+          <div class="repo-card">
+            <span>Rust / mini-redis</span>
+            <strong>27 files / 249 symbols / 2254 edges</strong>
+            <p><code>Connection</code> resolved to <code>src/connection.rs:21</code>. <code>read_frame</code> callers surfaced two client entrypoints.</p>
+          </div>
+          <div class="repo-card">
+            <span>Python / requests</span>
+            <strong>36 files / 759 symbols / 5373 edges</strong>
+            <p><code>Session</code> resolved to <code>src/requests/sessions.py:357</code>. Impact returned 58 nodes and 116 supporting edges.</p>
+          </div>
+          <div class="repo-card">
+            <span>Go / chi</span>
+            <strong>74 files / 433 symbols / 5809 edges</strong>
+            <p><code>NewRouter</code> resolved to <code>chi.go:60</code>. Impact returned 84 nodes and 252 supporting edges across examples and tests.</p>
+          </div>
+          <div class="repo-card">
+            <span>JavaScript / axios</span>
+            <strong>193 files / 2985 symbols / 26340 edges</strong>
+            <p><code>dispatchRequest</code> resolved to <code>lib/core/dispatchRequest.js:34</code>. Impact connected it back to <code>Axios::_request</code>.</p>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.repo }}" rel="noopener" target="_blank">Field test notes are from actual CLI runs</a>
       </div>
     </section>
 
@@ -290,7 +326,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1</code></pre>
           </div>
           <div>
             <h3>Agent metadata</h3>
-            <p>Repository-local agent guidance lives in <a href="{{ config.extra.repo }}/blob/main/AGENTS.md" rel="noopener" target="_blank">AGENTS.md</a> and the reusable project skill lives in <a href="{{ config.extra.repo }}/blob/main/SKILL.md" rel="noopener" target="_blank">SKILL.md</a>.</p>
+            <p>Repository-local contributor guidance lives in <a href="{{ config.extra.repo }}/blob/main/AGENTS.md" rel="noopener" target="_blank">AGENTS.md</a>. The agent-facing usage skill lives in <a href="{{ config.extra.repo }}/blob/main/SKILL.md" rel="noopener" target="_blank">SKILL.md</a> and is mirrored on this site in the Skill section.</p>
           </div>
           <div>
             <h3>Current status</h3>

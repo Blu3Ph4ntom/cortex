@@ -1,90 +1,86 @@
 ---
 name: cortex
-description: Production-oriented repository skill for Cortex. Use when modifying the graph engine, CLI, daemon, installers, or single-page Zola site.
+description: Use Cortex to get structural codebase context before editing an unfamiliar repository. Index the repo locally, resolve symbol ownership, trace callers and dependencies, and estimate blast radius through the CLI or local daemon.
 ---
 
 # Cortex Skill
 
-Use this skill when working inside the Cortex repository.
+Use this skill when Cortex is available in the working environment and you need structural answers about the codebase before making changes.
 
-## What Cortex Is
+## Best For
 
-Cortex is a local-first code knowledge engine for AI agents and developers. It indexes a repository into a persistent semantic graph and exposes that graph through:
+- finding the real owner of a symbol
+- checking who calls a function before editing it
+- tracing inbound and outbound dependencies
+- estimating bounded impact before refactors
+- giving coding agents more reliable architectural context than text search alone
 
-- `cortex-core`
-- `cortex-cli`
-- `cortex-daemon`
-- `site/`
+## Fast Workflow
 
-## Working Rules
+1. Build or refresh the local graph:
 
-- Preserve the public positioning: useful OSS beta, not compiler-grade semantic truth.
-- Keep the repo local-first.
-- Keep the website single-page with section navigation.
-- Only terminal and API command blocks should get copy buttons in the UI.
-- Keep README and site copy public-facing and concrete.
-
-## Repository Map
-
-- `crates/cortex-core`: graph model, extractors, indexer, store, query engine
-- `crates/cortex-cli`: CLI interface
-- `crates/cortex-daemon`: local HTTP daemon
-- `site/`: Zola marketing/docs surface
-- `scripts/`: install and self-test scripts
-
-## Validation Commands
-
-Use the MSVC toolchain on this Windows machine:
-
-```powershell
-cargo +stable-x86_64-pc-windows-msvc test --all-targets
-cargo +stable-x86_64-pc-windows-msvc clippy --all-targets --all-features -- -D warnings
+```bash
+cortex index --repo /path/to/repo
 ```
 
-For self-host verification:
+2. Resolve the target symbol:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1
+```bash
+cortex query --repo /path/to/repo find-symbol --name PaymentService
 ```
 
-## Website Workflow
+3. Inspect structural neighborhood before editing:
 
-Zola is installed via WinGet and is not guaranteed to be on `PATH`. Use:
-
-```powershell
-& 'C:\Users\heman\AppData\Local\Microsoft\WinGet\Packages\getzola.zola_Microsoft.Winget.Source_8wekyb3d8bbwe\zola.exe' build
+```bash
+cortex query --repo /path/to/repo callers --target update_status
+cortex query --repo /path/to/repo dependencies --target PaymentService --direction both --depth 1
+cortex query --repo /path/to/repo impact --target update_status --depth 1
 ```
 
-From `site/`, local preview:
+## What Each Query Is Good At
 
-```powershell
-& 'C:\Users\heman\AppData\Local\Microsoft\WinGet\Packages\getzola.zola_Microsoft.Winget.Source_8wekyb3d8bbwe\zola.exe' serve --interface 127.0.0.1 --port 1111
+- `find-symbol`
+  Use when you need the canonical definition candidate and file/span location.
+- `callers`
+  Use before changing behavior or signatures to see likely upstream dependents.
+- `callees`
+  Use when reading through behavior from a function outward.
+- `dependencies`
+  Use when you need the local structural neighborhood around a symbol or file.
+- `references`
+  Use for best-effort identifier references when call edges are insufficient.
+- `impact`
+  Use for a conservative blast-radius estimate with supporting edges.
+- `explain`
+  Use when you want a compact summary of why a symbol matters structurally.
+
+## Daemon Mode
+
+If repeated queries are needed, run the daemon once and hit the HTTP API:
+
+```bash
+cortexd --repo /path/to/repo --bind 127.0.0.1:8787
+curl "http://127.0.0.1:8787/graph/find_symbol?name=PaymentService"
 ```
 
-## Browser Verification
+## How To Use Results Well
 
-Use `agent-browser` for visual checks when changing the site.
+- quote the resolved file path and line span in your reasoning
+- distinguish confirmed structure from inferred behavior
+- use `callers`, `dependencies`, and `impact` before edits that could widen blast radius
+- fall back to direct code reading when the graph is too broad or ambiguous
 
-Recommended local flow:
+## Current Limits
 
-```powershell
-agent-browser --session cortex open http://127.0.0.1:1111
-agent-browser --session cortex screenshot --full
-```
+- Cortex is conservative and syntax-driven, not compiler-grade truth
+- dynamic dispatch, runtime data flow, and framework magic may need manual confirmation
+- larger impact results may include tests and example code; filter accordingly
 
-If Playwright’s default browser binary is missing, pass the installed Chromium explicitly:
+## Good Output Pattern For Agents
 
-```powershell
-agent-browser --session cortex --executable-path "$env:LOCALAPPDATA\ms-playwright\chromium-1208\chrome-win64\chrome.exe" open http://127.0.0.1:1111
-```
+When reporting findings from Cortex, include:
 
-## Release Surface
-
-If changing install or release behavior, inspect:
-
-- `.github/workflows/release.yml`
-- `scripts/install.sh`
-- `scripts/install.ps1`
-- `README.md`
-
-Do not ship install instructions that were not tested.
+- the queried symbol or target
+- the resolved owner path and span
+- the most relevant callers or dependencies
+- what remains uncertain and needs manual reading
