@@ -91,6 +91,9 @@
     function activateLink(link) {
       links.forEach((item) => item.classList.toggle("is-active", item === link));
       setIndicator(nav, indicator, link);
+      if (nav.scrollHeight > nav.clientHeight) {
+        link.scrollIntoView({ block: "nearest", behavior: "auto" });
+      }
     }
 
     if (mode === "sections") {

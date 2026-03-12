@@ -2,47 +2,60 @@
 
 {% block content %}
 {% set benchmarks = load_data(path="data/benchmarks.json") %}
+{% set overview = get_page(path="panels/overview.md") %}
+{% set install = get_page(path="panels/install.md") %}
+{% set quickstart = get_page(path="panels/quickstart.md") %}
+{% set agent_workflows = get_page(path="panels/agent-workflows.md") %}
+{% set queries = get_page(path="panels/queries.md") %}
+{% set skill = get_page(path="panels/skill.md") %}
+{% set benchmarks_page = get_page(path="panels/benchmarks.md") %}
+{% set daemon = get_page(path="panels/daemon.md") %}
+{% set architecture = get_page(path="panels/architecture.md") %}
+{% set contributing = get_page(path="panels/contributing.md") %}
+
 <div class="layout">
   <aside class="rail">
-    <a href="{{ get_url(path='') }}" class="brandmark" aria-label="cortex home">
-      {% include "partials/logo.html" %}
-      <div class="word">cortex</div>
-      <div class="kicker">Brain for codebases.</div>
-    </a>
+    <div class="rail-top">
+      <a href="{{ get_url(path='') }}" class="brandmark" aria-label="cortex home">
+        {% include "partials/logo.html" %}
+        <div class="word">cortex</div>
+        <div class="kicker">Brain for codebases.</div>
+      </a>
 
-    <div class="theme-switch" role="group" aria-label="Theme selection">
-      <button class="theme-option" type="button" data-theme-mode="system" aria-label="System theme">
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-          <line x1="8" y1="21" x2="16" y2="21"></line>
-          <line x1="12" y1="17" x2="12" y2="21"></line>
-        </svg>
-      </button>
-      <button class="theme-option" type="button" data-theme-mode="light" aria-label="Light theme">
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle>
-          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-        </svg>
-      </button>
-      <button class="theme-option" type="button" data-theme-mode="dark" aria-label="Dark theme">
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
+      <div class="theme-switch" role="group" aria-label="Theme selection">
+        <button class="theme-option" type="button" data-theme-mode="system" aria-label="System theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </button>
+        <button class="theme-option" type="button" data-theme-mode="light" aria-label="Light theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+          </svg>
+        </button>
+        <button class="theme-option" type="button" data-theme-mode="dark" aria-label="Dark theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <nav class="rail-nav" data-mode="sections" aria-label="Sections">
       <div class="nav-indicator" aria-hidden="true"></div>
-      <a href="#overview" data-section="overview" class="is-active"><span class="nav-text">Overview</span></a>
-      <a href="#install" data-section="install"><span class="nav-text">Install</span></a>
-      <a href="#quickstart" data-section="quickstart"><span class="nav-text">Quick start</span></a>
-      <a href="#agent-workflows" data-section="agent-workflows"><span class="nav-text">Agent workflows</span></a>
-      <a href="#queries" data-section="queries"><span class="nav-text">Query model</span></a>
-      <a href="#skill" data-section="skill"><span class="nav-text">Skill</span></a>
-      <a href="#benchmarks" data-section="benchmarks"><span class="nav-text">Benchmarks</span></a>
-      <a href="#daemon" data-section="daemon"><span class="nav-text">Daemon API</span></a>
-      <a href="#architecture" data-section="architecture"><span class="nav-text">Architecture</span></a>
-      <a href="#contributing" data-section="contributing"><span class="nav-text">Contributing</span></a>
+      <a href="#{{ overview.extra.section_id }}" data-section="{{ overview.extra.section_id }}" class="is-active"><span class="nav-text">{{ overview.extra.nav_title }}</span></a>
+      <a href="#{{ install.extra.section_id }}" data-section="{{ install.extra.section_id }}"><span class="nav-text">{{ install.extra.nav_title }}</span></a>
+      <a href="#{{ quickstart.extra.section_id }}" data-section="{{ quickstart.extra.section_id }}"><span class="nav-text">{{ quickstart.extra.nav_title }}</span></a>
+      <a href="#{{ agent_workflows.extra.section_id }}" data-section="{{ agent_workflows.extra.section_id }}"><span class="nav-text">{{ agent_workflows.extra.nav_title }}</span></a>
+      <a href="#{{ queries.extra.section_id }}" data-section="{{ queries.extra.section_id }}"><span class="nav-text">{{ queries.extra.nav_title }}</span></a>
+      <a href="#{{ skill.extra.section_id }}" data-section="{{ skill.extra.section_id }}"><span class="nav-text">{{ skill.extra.nav_title }}</span></a>
+      <a href="#{{ benchmarks_page.extra.section_id }}" data-section="{{ benchmarks_page.extra.section_id }}"><span class="nav-text">{{ benchmarks_page.extra.nav_title }}</span></a>
+      <a href="#{{ daemon.extra.section_id }}" data-section="{{ daemon.extra.section_id }}"><span class="nav-text">{{ daemon.extra.nav_title }}</span></a>
+      <a href="#{{ architecture.extra.section_id }}" data-section="{{ architecture.extra.section_id }}"><span class="nav-text">{{ architecture.extra.nav_title }}</span></a>
+      <a href="#{{ contributing.extra.section_id }}" data-section="{{ contributing.extra.section_id }}"><span class="nav-text">{{ contributing.extra.nav_title }}</span></a>
     </nav>
 
     <div class="rail-links">
@@ -52,7 +65,6 @@
         </svg>
         GitHub
       </a>
-
       <a class="external" href="https://x.com/Im_BluePhantom" rel="noopener" target="_blank">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M18.9 3.5h3l-6.5 7.4 7.6 9.6h-6l-4.7-6-5.2 6h-3l7-8-7.3-9.1h6l4.2 5.4 4.9-5.4zm-1.1 15h1.7L7.2 5.4H5.5l12.3 13.1z"></path>
@@ -63,254 +75,135 @@
   </aside>
 
   <div class="page">
-    <section id="overview" class="panel-section is-active" aria-labelledby="overview-heading">
+    <section id="{{ overview.extra.section_id }}" class="panel-section is-active" aria-labelledby="{{ overview.extra.section_id }}-heading">
       <div class="panel-body">
-        <span class="eyebrow">Local code knowledge for agents</span>
-        <h1 id="overview-heading">Structure before you edit.</h1>
-        <p class="lede">Cortex turns a repository into a local semantic graph so agents can answer structural questions before they edit code: who owns this symbol, who calls it, what depends on it, and what is the likely blast radius of a change.</p>
-
+        <span class="eyebrow">{{ overview.extra.eyebrow }}</span>
+        <h1 id="{{ overview.extra.section_id }}-heading">{{ overview.title }}</h1>
+        <p class="lede">{{ overview.description }}</p>
         <div class="cta">
-          <a class="btn primary" href="#install">Get Started</a>
+          <a class="btn primary" href="#{{ install.extra.section_id }}">Get Started</a>
           <a class="btn external" href="{{ config.extra.repo }}" rel="noopener" target="_blank">GitHub</a>
         </div>
-
-        <div class="hero-stats">
-          <div class="metric-card">
-            <span>Benchmark corpus</span>
-            <strong>{{ benchmarks.summary.repo_count }} repos / {{ benchmarks.summary.scenario_count }} scenarios</strong>
-            <p>{{ benchmarks.summary.corpus_files }} files, {{ benchmarks.summary.corpus_symbols }} symbols, and {{ benchmarks.summary.corpus_edges }} edges across Rust, Python, Go, and JavaScript.</p>
-          </div>
-          <div class="metric-card">
-            <span>Measured narrowing</span>
-            <strong>{{ benchmarks.summary.overall_candidate_reduction }}x fewer raw hits</strong>
-            <p>Cortex reduced {{ benchmarks.summary.total_baseline_hits }} grep hits across {{ benchmarks.summary.total_baseline_files }} files down to {{ benchmarks.summary.total_cortex_results }} structured answers on the same tasks.</p>
-          </div>
-        </div>
-
-        <div class="features">
-          <div class="feature-item">
-            <h4>Answer structural questions directly</h4>
-            <p>Resolve symbol ownership, callers, dependencies, references, and bounded impact without manually walking grep output.</p>
-          </div>
-          <div class="feature-item">
-            <h4>Keep everything local</h4>
-            <p>Cortex builds and queries a persistent graph on your machine. No hosted service, remote index, or vendor lock-in is required.</p>
-          </div>
-          <div class="feature-item">
-            <h4>Designed for agent workflows</h4>
-            <p>Use the CLI for one-off orientation or keep the daemon warm for editors, automations, and coding agents that need repeated graph lookups.</p>
-          </div>
-          <div class="feature-item">
-            <h4>Benchmark-backed, not hand-waved</h4>
-            <p>The repository includes a reproducible benchmark harness and published artifacts comparing Cortex against a raw text-search baseline.</p>
-          </div>
+        {{ overview.content | safe }}
+        <div class="panel-footer">
+          <a href="{{ config.extra.repo }}/edit/main/{{ overview.extra.edit_path }}" rel="noopener" target="_blank">Edit on GitHub</a>
         </div>
       </div>
     </section>
 
-    <section id="install" class="panel-section" aria-labelledby="install-heading">
+    <section id="{{ install.extra.section_id }}" class="panel-section" aria-labelledby="{{ install.extra.section_id }}-heading">
       <div class="panel-body">
-        <span class="eyebrow">Install</span>
-        <h2 id="install-heading">Install Cortex fast.</h2>
-        <p class="section-intro">Use the release installer for a local binary, or build from source if you want to hack on the monorepo.</p>
-
-        <div class="quick">
-          <div class="cmd command-card">
-            <span>macOS / Linux</span>
-            <code>curl -fsSL https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.sh | sh</code>
-          </div>
-          <div class="cmd command-card">
-            <span>Windows (PowerShell)</span>
-            <code>irm https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.ps1 | iex</code>
-          </div>
-          <div class="cmd command-card">
-            <span>Build from source</span>
-            <code>git clone https://github.com/Blu3Ph4ntom/cortex.git
-cd cortex
-cargo install --path crates/cortex-cli
-cargo install --path crates/cortex-daemon</code>
-          </div>
-        </div>
-
-        <div class="fact-list">
-          <div class="fact-item">
-            <span>Install target</span>
-            <p>Release installers place binaries in a common local path: <code>~/.local/bin</code> on Unix and <code>$HOME\.cortex\bin</code> on Windows.</p>
-          </div>
-          <div class="fact-item">
-            <span>Windows note</span>
-            <p>Use the MSVC Rust toolchain if your GNU toolchain does not ship <code>gcc.exe</code> and <code>dlltool.exe</code>.</p>
-          </div>
+        <span class="eyebrow">{{ install.extra.eyebrow }}</span>
+        <h2 id="{{ install.extra.section_id }}-heading">{{ install.title }}</h2>
+        <p class="section-intro">{{ install.description }}</p>
+        {{ install.content | safe }}
+        <div class="panel-footer">
+          <a href="{{ config.extra.repo }}/edit/main/{{ install.extra.edit_path }}" rel="noopener" target="_blank">Edit on GitHub</a>
         </div>
       </div>
     </section>
 
-    <section id="quickstart" class="panel-section" aria-labelledby="quickstart-heading">
+    <section id="{{ quickstart.extra.section_id }}" class="panel-section" aria-labelledby="{{ quickstart.extra.section_id }}-heading">
       <div class="panel-body">
-        <span class="eyebrow">Quick start</span>
-        <h2 id="quickstart-heading">Index once, query before you edit.</h2>
-        <p class="section-intro">The common agent loop is simple: build the graph, resolve the owner, inspect callers, then check blast radius.</p>
-
-        <div class="quick">
-          <div class="cmd command-card">
-            <span>Index a repository</span>
-            <code>cortex index --repo /path/to/repo</code>
-          </div>
-          <div class="cmd command-card">
-            <span>Resolve a symbol owner</span>
-            <code>cortex query --repo /path/to/repo find-symbol --name RepositorySession</code>
-          </div>
-          <div class="cmd command-card">
-            <span>Check callers before a change</span>
-            <code>cortex query --repo /path/to/repo callers --target open_session</code>
-          </div>
-          <div class="cmd command-card">
-            <span>Inspect dependencies and blast radius</span>
-            <code>cortex query --repo /path/to/repo dependencies --target RepositorySession --direction both --depth 1
-cortex query --repo /path/to/repo impact --target open_session --depth 1</code>
-          </div>
+        <span class="eyebrow">{{ quickstart.extra.eyebrow }}</span>
+        <h2 id="{{ quickstart.extra.section_id }}-heading">{{ quickstart.title }}</h2>
+        <p class="section-intro">{{ quickstart.description }}</p>
+        {{ quickstart.content | safe }}
+        <div class="panel-footer">
+          <a href="{{ config.extra.repo }}/edit/main/{{ quickstart.extra.edit_path }}" rel="noopener" target="_blank">Edit on GitHub</a>
         </div>
       </div>
     </section>
 
-    <section id="agent-workflows" class="panel-section" aria-labelledby="agent-workflows-heading">
+    <section id="{{ agent_workflows.extra.section_id }}" class="panel-section" aria-labelledby="{{ agent_workflows.extra.section_id }}-heading">
       <div class="panel-body">
-        <span class="eyebrow">Agent workflows</span>
-        <h2 id="agent-workflows-heading">Use it where agents usually guess.</h2>
-
-        <div class="features">
-          <div class="feature-item">
-            <h4>Pre-edit orientation</h4>
-            <p>Resolve the canonical owner of a symbol before an agent starts patching an unfamiliar codebase.</p>
-          </div>
-          <div class="feature-item">
-            <h4>Refactor safety checks</h4>
-            <p>Ask for callers and dependencies first, then make the signature or behavior change with less blind risk.</p>
-          </div>
-          <div class="feature-item">
-            <h4>Review context</h4>
-            <p>Attach structural neighbors and likely impact to a patch review so the summary is grounded in code relationships, not filename guesses.</p>
-          </div>
-          <div class="feature-item">
-            <h4>Local automation</h4>
-            <p>Let local automation, editors, or daemon clients query the graph repeatedly without rebuilding context from scratch every turn.</p>
-          </div>
-        </div>
-
-        <div class="fact-list">
-          <div class="fact-item">
-            <span>Good fit</span>
-            <p>Repository orientation, targeted edits, change review, bounded blast-radius checks, and machine-readable architecture discovery.</p>
-          </div>
-          <div class="fact-item">
-            <span>Not a fit</span>
-            <p>Compiler-grade proof, runtime data-flow certainty, or framework magic that only resolves through execution.</p>
-          </div>
+        <span class="eyebrow">{{ agent_workflows.extra.eyebrow }}</span>
+        <h2 id="{{ agent_workflows.extra.section_id }}-heading">{{ agent_workflows.title }}</h2>
+        <p class="section-intro">{{ agent_workflows.description }}</p>
+        {{ agent_workflows.content | safe }}
+        <div class="panel-footer">
+          <a href="{{ config.extra.repo }}/edit/main/{{ agent_workflows.extra.edit_path }}" rel="noopener" target="_blank">Edit on GitHub</a>
         </div>
       </div>
     </section>
 
-    <section id="queries" class="panel-section" aria-labelledby="queries-heading">
+    <section id="{{ queries.extra.section_id }}" class="panel-section" aria-labelledby="{{ queries.extra.section_id }}-heading">
       <div class="panel-body">
-        <span class="eyebrow">Query model</span>
-        <h2 id="queries-heading">The surface area is small on purpose.</h2>
-
-        <div class="features">
-          <div class="feature-item">
-            <h4><code>find-symbol</code></h4>
-            <p>Resolve the canonical owner candidate for a symbol and get back a file path plus span.</p>
-          </div>
-          <div class="feature-item">
-            <h4><code>callers</code> / <code>callees</code></h4>
-            <p>Walk into the call chain before you change behavior or when you are tracing outward from a function.</p>
-          </div>
-          <div class="feature-item">
-            <h4><code>dependencies</code></h4>
-            <p>Inspect the local inbound and outbound structural neighborhood around a symbol or file.</p>
-          </div>
-          <div class="feature-item">
-            <h4><code>references</code> / <code>impact</code> / <code>explain</code></h4>
-            <p>Get conservative reference sets, likely blast radius, and a summary of why a symbol matters in the current graph.</p>
-          </div>
-        </div>
-
-        <div class="quick">
-          <div class="cmd command-card">
-            <span>Owner lookup</span>
-            <code>cortex query --repo /path/to/repo find-symbol --name PaymentService</code>
-          </div>
-          <div class="cmd command-card">
-            <span>Caller trace</span>
-            <code>cortex query --repo /path/to/repo callers --target update_status</code>
-          </div>
-          <div class="cmd command-card">
-            <span>Explain a symbol</span>
-            <code>cortex query --repo /path/to/repo explain --target PaymentService</code>
-          </div>
+        <span class="eyebrow">{{ queries.extra.eyebrow }}</span>
+        <h2 id="{{ queries.extra.section_id }}-heading">{{ queries.title }}</h2>
+        <p class="section-intro">{{ queries.description }}</p>
+        {{ queries.content | safe }}
+        <div class="panel-footer">
+          <a href="{{ config.extra.repo }}/edit/main/{{ queries.extra.edit_path }}" rel="noopener" target="_blank">Edit on GitHub</a>
         </div>
       </div>
     </section>
 
-    <section id="skill" class="panel-section" aria-labelledby="skill-heading">
+    <section id="{{ skill.extra.section_id }}" class="panel-section" aria-labelledby="{{ skill.extra.section_id }}-heading">
       <div class="panel-body">
-        <span class="eyebrow">Agent skill</span>
-        <h2 id="skill-heading">Ship the usage guide with the tool.</h2>
-        <p class="section-intro">Cortex includes an agent-facing <code>SKILL.md</code> that tells a coding agent when to use the graph, how to sequence the key queries, and how to report uncertainty honestly.</p>
-
-        <div class="grid two-up">
-          <div>
-            <h3>Install the skill</h3>
-            <div class="quick">
-              <div class="cmd command-card">
-                <span>Compatible agent skill install</span>
-                <code>npx skills add https://github.com/Blu3Ph4ntom/cortex --skill cortex</code>
-              </div>
-            </div>
-            <p class="muted">If your runtime supports remote skill sources directly, point it at the repository file or the raw file URL below.</p>
-            <ul class="inline-links">
-              <li><a class="external" href="{{ config.extra.repo }}/blob/main/SKILL.md" rel="noopener" target="_blank">GitHub source</a></li>
-              <li><a class="external" href="https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/SKILL.md" rel="noopener" target="_blank">Raw SKILL.md</a></li>
-              <li><a href="{{ get_url(path='skill') }}">Rendered /skill page</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3>What it teaches an agent</h3>
-            <div class="fact-list compact">
-              <div class="fact-item">
-                <span>Sequence</span>
-                <p>Index the repo, resolve the owner, inspect callers or dependencies, then run impact before the edit lands.</p>
-              </div>
-              <div class="fact-item">
-                <span>Reporting</span>
-                <p>Quote the resolved file path and span, distinguish confirmed structure from inference, and mark dynamic behavior as uncertain.</p>
-              </div>
-              <div class="fact-item">
-                <span>Boundaries</span>
-                <p>Use Cortex for structural truth; fall back to direct code reading when runtime behavior or framework indirection matters more than syntax.</p>
-              </div>
-            </div>
-          </div>
+        <span class="eyebrow">{{ skill.extra.eyebrow }}</span>
+        <h2 id="{{ skill.extra.section_id }}-heading">{{ skill.title }}</h2>
+        <p class="section-intro">{{ skill.description }}</p>
+        {{ skill.content | safe }}
+        <div class="panel-footer">
+          <a href="{{ config.extra.repo }}/edit/main/{{ skill.extra.edit_path }}" rel="noopener" target="_blank">Edit on GitHub</a>
         </div>
       </div>
     </section>
 
-    <section id="benchmarks" class="panel-section" aria-labelledby="benchmarks-heading">
+    <section id="{{ daemon.extra.section_id }}" class="panel-section" aria-labelledby="{{ daemon.extra.section_id }}-heading">
       <div class="panel-body">
-        <span class="eyebrow">Benchmarks</span>
-        <h2 id="benchmarks-heading">Measured against raw text search.</h2>
-        <p class="section-intro">The benchmark harness in this repo compares Cortex warm-query results against <code>git grep -n -w</code> on the same structural tasks. Grep is often faster to start; Cortex wins by collapsing the search surface into a much smaller set of structural answers.</p>
+        <span class="eyebrow">{{ daemon.extra.eyebrow }}</span>
+        <h2 id="{{ daemon.extra.section_id }}-heading">{{ daemon.title }}</h2>
+        <p class="section-intro">{{ daemon.description }}</p>
+        {{ daemon.content | safe }}
+        <div class="panel-footer">
+          <a href="{{ config.extra.repo }}/edit/main/{{ daemon.extra.edit_path }}" rel="noopener" target="_blank">Edit on GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="{{ architecture.extra.section_id }}" class="panel-section" aria-labelledby="{{ architecture.extra.section_id }}-heading">
+      <div class="panel-body">
+        <span class="eyebrow">{{ architecture.extra.eyebrow }}</span>
+        <h2 id="{{ architecture.extra.section_id }}-heading">{{ architecture.title }}</h2>
+        <p class="section-intro">{{ architecture.description }}</p>
+        {{ architecture.content | safe }}
+        <div class="panel-footer">
+          <a href="{{ config.extra.repo }}/edit/main/{{ architecture.extra.edit_path }}" rel="noopener" target="_blank">Edit on GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="{{ contributing.extra.section_id }}" class="panel-section" aria-labelledby="{{ contributing.extra.section_id }}-heading">
+      <div class="panel-body">
+        <span class="eyebrow">{{ contributing.extra.eyebrow }}</span>
+        <h2 id="{{ contributing.extra.section_id }}-heading">{{ contributing.title }}</h2>
+        <p class="section-intro">{{ contributing.description }}</p>
+        {{ contributing.content | safe }}
+        <div class="panel-footer">
+          <a href="{{ config.extra.repo }}/edit/main/{{ contributing.extra.edit_path }}" rel="noopener" target="_blank">Edit on GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="{{ benchmarks_page.extra.section_id }}" class="panel-section" aria-labelledby="{{ benchmarks_page.extra.section_id }}-heading">
+      <div class="panel-body">
+        <span class="eyebrow">{{ benchmarks_page.extra.eyebrow }}</span>
+        <h2 id="{{ benchmarks_page.extra.section_id }}-heading">{{ benchmarks_page.title }}</h2>
+        <p class="section-intro">{{ benchmarks_page.description }}</p>
+        {{ benchmarks_page.content | safe }}
 
         <div class="hero-stats">
           <div class="metric-card">
             <span>Corpus</span>
-            <strong>{{ benchmarks.summary.corpus_files }} files / {{ benchmarks.summary.corpus_symbols }} symbols</strong>
-            <p>{{ benchmarks.summary.repo_count }} repos, {{ benchmarks.summary.scenario_count }} structural scenarios, and {{ benchmarks.summary.corpus_edges }} indexed edges.</p>
+            <strong>{{ benchmarks.summary.repo_count }} repos / {{ benchmarks.summary.scenario_count }} scenarios</strong>
+            <p>{{ benchmarks.summary.corpus_files }} files, {{ benchmarks.summary.corpus_symbols }} symbols, and {{ benchmarks.summary.corpus_edges }} indexed edges across the benchmark set.</p>
           </div>
           <div class="metric-card">
-            <span>Search surface</span>
-            <strong>{{ benchmarks.summary.total_baseline_hits }} grep hits → {{ benchmarks.summary.total_cortex_results }} graph results</strong>
-            <p>{{ benchmarks.summary.overall_candidate_reduction }}x fewer raw hits for an agent to inspect across the benchmark set.</p>
+            <span>Candidate narrowing</span>
+            <strong>{{ benchmarks.summary.overall_candidate_reduction }}x fewer raw hits</strong>
+            <p>{{ benchmarks.summary.total_baseline_hits }} grep hits across {{ benchmarks.summary.total_baseline_files }} files dropped to {{ benchmarks.summary.total_cortex_results }} structural answers.</p>
           </div>
         </div>
 
@@ -367,128 +260,11 @@ cortex query --repo /path/to/repo impact --target open_session --depth 1</code>
           {% endfor %}
         </div>
 
-        <div class="fact-list">
-          <div class="fact-item">
-            <span>Methodology</span>
-            <p>Cold index medians come from fresh stores. Warm-query medians reuse a prepared local store. The baseline is raw repo search, not a compiler or a proprietary SaaS tool.</p>
-          </div>
-          <div class="fact-item">
-            <span>Artifacts</span>
-            <p><a href="{{ config.extra.repo }}/blob/main/benchmarks/latest.md" rel="noopener" target="_blank">Benchmark report</a> and <a href="{{ config.extra.repo }}/blob/main/benchmarks/latest.json" rel="noopener" target="_blank">benchmark JSON</a> ship in the repository.</p>
-          </div>
+        <div class="panel-footer">
+          <a href="{{ config.extra.repo }}/edit/main/{{ benchmarks_page.extra.edit_path }}" rel="noopener" target="_blank">Edit on GitHub</a>
         </div>
       </div>
     </section>
-
-    <section id="daemon" class="panel-section" aria-labelledby="daemon-heading">
-      <div class="panel-body">
-        <span class="eyebrow">Daemon API</span>
-        <h2 id="daemon-heading">Keep the graph warm for tools.</h2>
-        <p class="section-intro">Use the local daemon when another process needs repeated access without shelling out for each query.</p>
-
-        <div class="quick">
-          <div class="cmd command-card">
-            <span>Start the daemon</span>
-            <code>cortexd --repo /path/to/repo --bind 127.0.0.1:8787</code>
-          </div>
-          <div class="cmd command-card">
-            <span>Resolve a symbol over HTTP</span>
-            <code>curl "http://127.0.0.1:8787/graph/find_symbol?name=RepositorySession"</code>
-          </div>
-          <div class="cmd command-card">
-            <span>Ask for callers over HTTP</span>
-            <code>curl "http://127.0.0.1:8787/graph/callers?target=open_session"</code>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="architecture" class="panel-section" aria-labelledby="architecture-heading">
-      <div class="panel-body">
-        <span class="eyebrow">Architecture</span>
-        <h2 id="architecture-heading">A small Rust monorepo with hard boundaries.</h2>
-
-        <div class="features">
-          <div class="feature-item">
-            <h4><code>cortex-core</code></h4>
-            <p>Holds the graph model, parser extractors, indexer, storage layer, and query engine.</p>
-          </div>
-          <div class="feature-item">
-            <h4><code>cortex-cli</code></h4>
-            <p>Exposes indexing, doctor, export, watch, and query commands for local use and scripting.</p>
-          </div>
-          <div class="feature-item">
-            <h4><code>cortex-daemon</code></h4>
-            <p>Serves the same structural answers over local HTTP for tools that want a long-lived process.</p>
-          </div>
-          <div class="feature-item">
-            <h4>Semantic shape</h4>
-            <p>Today the graph tracks repositories, files, symbols, and edges such as defines, contains, imports, references, calls, depends_on, and owned_by.</p>
-          </div>
-        </div>
-
-        <div class="fact-list">
-          <div class="fact-item">
-            <span>Current tradeoff</span>
-            <p>Cortex is intentionally conservative and syntax-driven. That is enough to make it useful for navigation and pre-edit context, but not enough to claim compiler-grade semantic truth.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="contributing" class="panel-section" aria-labelledby="contributing-heading">
-      <div class="panel-body">
-        <span class="eyebrow">Contributing</span>
-        <h2 id="contributing-heading">Treat it like infrastructure.</h2>
-
-        <div class="grid two-up">
-          <div>
-            <h3>Developer loop</h3>
-            <div class="quick">
-              <div class="cmd command-card">
-                <span>Format, lint, test, and self-check</span>
-                <code>cargo fmt
-cargo clippy --all-targets --all-features -- -D warnings
-cargo test --all-targets
-powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1</code>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3>What ships with the repo</h3>
-            <div class="fact-list compact">
-              <div class="fact-item">
-                <span>AGENTS.md</span>
-                <p>Repository-specific contributor instructions for working on Cortex itself.</p>
-              </div>
-              <div class="fact-item">
-                <span>SKILL.md</span>
-                <p>Agent-facing instructions for using Cortex on arbitrary codebases.</p>
-              </div>
-              <div class="fact-item">
-                <span>Benchmarks</span>
-                <p>Reproducible benchmark artifacts and the PowerShell harness that generated them.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="fact-list">
-          <div class="fact-item">
-            <span>Status</span>
-            <p>Cortex is useful now for local structural awareness and agent workflows. It is still OSS beta software, not yet a compiler-accurate or large-fleet autonomous editing platform.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <footer class="page-footer">
-      <a href="{{ config.extra.repo }}" rel="noopener" target="_blank">GitHub</a>
-      <a href="{{ config.extra.repo }}/blob/main/README.md" rel="noopener" target="_blank">README</a>
-      <a href="{{ config.extra.repo }}/blob/main/benchmarks/latest.md" rel="noopener" target="_blank">Benchmark report</a>
-      <a href="{{ get_url(path='skill') }}">/skill</a>
-    </footer>
   </div>
 </div>
 {% endblock content %}

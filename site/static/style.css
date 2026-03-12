@@ -68,7 +68,7 @@ pre {
     display: grid;
     grid-template-columns: minmax(228px, 252px) minmax(0, 1fr);
     gap: 76px;
-    padding-top: 44px;
+    padding-top: 28px;
     padding-bottom: 32px;
     align-items: start;
 }
@@ -76,25 +76,46 @@ pre {
 .rail,
 .sidebar {
     position: sticky;
-    top: 44px;
+    top: 28px;
     align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+    padding-bottom: 8px;
+}
+
+.rail-top,
+.sidebar-top {
     display: grid;
-    gap: 30px;
-    max-height: calc(100vh - 88px);
+    gap: 14px;
+}
+
+.rail-nav {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    padding-left: 16px;
+    padding-right: 10px;
+    min-height: 0;
+    flex: 1 1 auto;
     overflow-y: auto;
-    padding-right: 12px;
-    padding-bottom: 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
 }
 
-.rail::-webkit-scrollbar,
-.sidebar::-webkit-scrollbar {
-    width: 8px;
+.rail-nav::-webkit-scrollbar {
+    width: 7px;
 }
 
-.rail::-webkit-scrollbar-thumb,
-.sidebar::-webkit-scrollbar-thumb {
+.rail-nav::-webkit-scrollbar-thumb {
     background: var(--border);
     border-radius: 999px;
+}
+
+.rail-nav::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .brandmark,
@@ -102,19 +123,19 @@ pre {
     text-decoration: none;
     color: inherit;
     display: grid;
-    gap: 14px;
+    gap: 8px;
 }
 
 .logo-mark {
-    width: 46px;
-    height: 46px;
+    width: 50px;
+    height: 50px;
     display: inline-block;
     transition: transform 0.24s ease-out;
 }
 
 .brandmark:hover .logo-mark,
 .brand-lockup:hover .logo-mark {
-    transform: rotate(12deg);
+    transform: rotate(90deg);
 }
 
 .word,
@@ -147,8 +168,8 @@ pre {
     border: none;
     background: transparent;
     color: var(--text);
-    width: 42px;
-    height: 38px;
+    width: 40px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -174,18 +195,12 @@ pre {
     color: var(--bg);
 }
 
-.rail-nav {
-    position: relative;
-    display: grid;
-    gap: 6px;
-    padding-left: 16px;
-}
-
 .rail-nav a {
     position: relative;
     text-decoration: none;
-    font-size: 14px;
-    padding: 6px 0;
+    font-size: 12px;
+    padding: 2px 0;
+    line-height: 1.35;
     opacity: 0.5;
     transition: opacity var(--transition-base), transform var(--transition-base);
 }
@@ -215,8 +230,9 @@ pre {
 .rail-links,
 .sidebar-footer {
     display: grid;
-    gap: 12px;
-    padding-top: 22px;
+    gap: 8px;
+    padding-top: 12px;
+    margin-top: auto;
     border-top: 1px solid var(--border);
 }
 
@@ -226,7 +242,7 @@ pre {
     align-items: center;
     gap: 8px;
     text-decoration: none;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--muted);
     transition: color var(--transition-base), opacity var(--transition-base);
 }
@@ -245,7 +261,7 @@ pre {
 .page,
 .content-column {
     min-width: 0;
-    padding-bottom: 120px;
+    padding-bottom: 160px;
 }
 
 .panel-section {
@@ -272,9 +288,9 @@ pre {
 
 h1 {
     margin: 0;
-    max-width: 11.5ch;
-    font-size: clamp(2.35rem, 4.2vw, 3.9rem);
-    line-height: 0.98;
+    max-width: 12ch;
+    font-size: clamp(2.05rem, 3.25vw, 3.2rem);
+    line-height: 1;
     letter-spacing: -0.05em;
     font-weight: 760;
 }
@@ -527,17 +543,17 @@ pre code {
 }
 
 .inline-links a,
-.page-footer a,
 .skill-prose a,
-.fact-item a {
+.fact-item a,
+.panel-footer a {
     text-decoration: none;
     border-bottom: 1px solid var(--border-strong);
 }
 
 .inline-links a:hover,
-.page-footer a:hover,
 .skill-prose a:hover,
-.fact-item a:hover {
+.fact-item a:hover,
+.panel-footer a:hover {
     border-color: var(--text);
 }
 
@@ -577,15 +593,17 @@ pre code {
     color: var(--success);
 }
 
-.page-footer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding-top: 24px;
-    margin-top: 44px;
+.panel-footer {
+    padding-top: 26px;
+    margin-top: 10px;
     border-top: 1px solid var(--border);
     color: var(--muted);
     font-size: 0.92rem;
+}
+
+.skill-source-card {
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
 }
 
 .external {
@@ -674,16 +692,22 @@ pre code {
     .rail,
     .sidebar {
         position: static;
-        max-height: none;
+        height: auto;
         overflow: visible;
-        padding-right: 0;
         padding-bottom: 20px;
         border-bottom: 1px solid var(--border);
+    }
+
+    .rail-top,
+    .sidebar-top {
+        gap: 24px;
     }
 
     .rail-nav {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px 16px;
+        overflow: visible;
+        padding-right: 0;
     }
 
     .nav-indicator {
@@ -706,8 +730,8 @@ pre code {
 
 @media (max-width: 640px) {
     h1 {
-        max-width: 9.5ch;
-        font-size: clamp(2.05rem, 10vw, 3rem);
+        max-width: 13ch;
+        font-size: clamp(2rem, 9vw, 3rem);
     }
 
     h2 {

@@ -1,59 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="page-shell skill-shell">
-  <aside class="sidebar">
-    <a href="{{ get_url(path='') }}" class="brand-lockup" aria-label="cortex home">
-      {% include "partials/logo.html" %}
-      <div class="brand-name">cortex</div>
-      <div class="tagline">Brain for codebases.</div>
-    </a>
-
-    <div class="theme-switch" role="group" aria-label="Theme selection">
-      <button class="theme-option" type="button" data-theme-mode="system" aria-label="System theme">
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-          <line x1="8" y1="21" x2="16" y2="21"></line>
-          <line x1="12" y1="17" x2="12" y2="21"></line>
-        </svg>
-      </button>
-      <button class="theme-option" type="button" data-theme-mode="light" aria-label="Light theme">
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle>
-          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-        </svg>
-      </button>
-      <button class="theme-option" type="button" data-theme-mode="dark" aria-label="Dark theme">
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
-    </div>
-
-    <nav class="rail-nav" data-mode="anchors" aria-label="Skill page sections">
-      <div class="nav-indicator" aria-hidden="true"></div>
-      <a href="#install-the-skill" class="is-active"><span class="nav-text">Install</span></a>
-      <a href="#direct-skill-urls"><span class="nav-text">URLs</span></a>
-      <a href="#tell-an-agent-how-to-use-it"><span class="nav-text">Agent use</span></a>
-      <a href="#cortex-skill"><span class="nav-text">Full skill</span></a>
-      <a href="#current-limits"><span class="nav-text">Limits</span></a>
-    </nav>
-
-    <div class="rail-links">
-      <a href="{{ get_url(path='') }}#skill">Back to home</a>
-      <a class="external" href="{{ config.extra.repo }}" rel="noopener" target="_blank">GitHub</a>
-      <a class="external" href="https://x.com/Im_BluePhantom" rel="noopener" target="_blank">@Im_BluePhantom</a>
-    </div>
-  </aside>
-
-  <article class="content-column doc-article">
-    <span class="eyebrow">Rendered agent skill</span>
-    <h1>{{ page.title }}</h1>
-    <p class="lede">This page mirrors the agent-facing usage skill that ships with Cortex. Use it when you want a coding agent to orient itself structurally inside a repository before it edits code.</p>
-
-    <div class="prose skill-prose">
-      {{ page.content | safe }}
-    </div>
-  </article>
-</div>
+<meta http-equiv="refresh" content="0; url=../#skill">
+<main class="redirect-shell">
+  <p>Redirecting to <a href="../#skill">the Cortex skill section</a>.</p>
+</main>
 {% endblock content %}
