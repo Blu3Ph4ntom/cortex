@@ -28,7 +28,13 @@ html,
 body {
     margin: 0;
     padding: 0;
-    font-family: "IBM Plex Sans", sans-serif;
+    font-family:
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
     background: var(--bg);
     color: var(--text);
     line-height: 1.6;
@@ -70,8 +76,8 @@ body {
 .mark,
 .brand-mark,
 .logo-mark {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     display: inline-block;
     transition: transform var(--transition-bounce);
     cursor: pointer;
@@ -426,6 +432,13 @@ h3 {
     opacity: 0.78;
 }
 
+.command-card code {
+    display: block;
+    white-space: pre;
+    overflow-x: auto;
+    padding-bottom: 2px;
+}
+
 .quick .cmd:hover {
     border-color: var(--text);
 }
@@ -524,7 +537,7 @@ code {
     height: 32px;
     padding: 7px;
     cursor: pointer;
-    opacity: 0;
+    opacity: 0.42;
     transition: all var(--transition-base);
     border-radius: 6px;
     display: flex;

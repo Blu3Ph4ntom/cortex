@@ -56,6 +56,8 @@
         </svg>
         @Im_BluePhantom
       </a>
+
+      <a class="external" href="{{ config.extra.repo }}/blob/main/SKILL.md" rel="noopener" target="_blank">Skill</a>
     </div>
   </aside>
 
@@ -89,6 +91,7 @@
           </div>
         </div>
 
+        <h3>Validated on this repository</h3>
         <div class="metric-grid">
           <div class="metric-card">
             <span>Files</span>
@@ -132,11 +135,11 @@
             <h3>One-line installer</h3>
             <p>Detects OS and architecture, downloads the latest release binary, and installs it to a common local path.</p>
             <div class="quick">
-              <div class="cmd">
+              <div class="cmd command-card">
                 <span>macOS / Linux</span>
                 <code>curl -fsSL https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.sh | sh</code>
               </div>
-              <div class="cmd">
+              <div class="cmd command-card">
                 <span>Windows (PowerShell)</span>
                 <code>irm https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.ps1 | iex</code>
               </div>
@@ -145,7 +148,7 @@
           <div>
             <h3>Build from source</h3>
             <div class="quick">
-              <div class="cmd">
+              <div class="cmd command-card">
                 <span>macOS / Linux / Windows</span>
                 <code>git clone https://github.com/Blu3Ph4ntom/cortex.git
 cd cortex
@@ -207,18 +210,21 @@ cortex query --repo /path/to/repo dependencies --target RepositorySession --dire
         <h2 id="queries-heading">Query model</h2>
         <div class="grid">
           <div>
+            <h3>What you can ask</h3>
             <ul>
               <li><code>find-symbol &lt;name&gt;</code> — resolve the canonical owner of a symbol</li>
               <li><code>dependencies &lt;target&gt;</code> — inspect inbound and outbound structural neighbors</li>
               <li><code>callers &lt;target&gt;</code> — find the functions or commands that invoke a helper</li>
-            </ul>
-          </div>
-          <div>
-            <ul>
               <li><code>callees &lt;target&gt;</code> — walk outward from a function into what it invokes</li>
               <li><code>references &lt;target&gt;</code> — inspect best-effort identifier references</li>
               <li><code>impact &lt;target&gt;</code> / <code>explain &lt;target&gt;</code> — summarize likely blast radius and structural context</li>
             </ul>
+          </div>
+          <div>
+            <h3>Representative commands</h3>
+            <pre><code>cortex query --repo /path/to/repo find-symbol --name RepositorySession
+cortex query --repo /path/to/repo callers --target open_session
+cortex query --repo /path/to/repo impact --target open_session --depth 1</code></pre>
           </div>
         </div>
       </div>
@@ -253,6 +259,14 @@ curl "http://127.0.0.1:8787/graph/callers?target=open_session"</code></pre>
             </ul>
           </div>
           <div>
+            <h3>Semantic shape today</h3>
+            <ul>
+              <li>nodes: repositories, files, symbols</li>
+              <li>edges: defines, contains, imports, references, calls, depends_on, owned_by</li>
+              <li>derived views: callers, callees, dependencies, impact, explain</li>
+            </ul>
+          </div>
+          <div>
             <h3>Current tradeoff</h3>
             <p>The graph is intentionally conservative and syntax-driven. It is already useful for navigation, review context, and bounded impact analysis, but it is not compiler-grade proof.</p>
           </div>
@@ -273,6 +287,10 @@ curl "http://127.0.0.1:8787/graph/callers?target=open_session"</code></pre>
 cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all-targets
 powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1</code></pre>
+          </div>
+          <div>
+            <h3>Agent metadata</h3>
+            <p>Repository-local agent guidance lives in <a href="{{ config.extra.repo }}/blob/main/AGENTS.md" rel="noopener" target="_blank">AGENTS.md</a> and the reusable project skill lives in <a href="{{ config.extra.repo }}/blob/main/SKILL.md" rel="noopener" target="_blank">SKILL.md</a>.</p>
           </div>
           <div>
             <h3>Current status</h3>
@@ -400,6 +418,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1</code></pre>
     if (pre.querySelector(".copy-btn")) return;
     const codeEl = pre.querySelector("code");
     pre.appendChild(makeCopyButton(() => (codeEl ? codeEl.innerText : pre.innerText)));
+  });
+
+  document.querySelectorAll(".command-card").forEach((card) => {
+    if (card.querySelector(".copy-btn")) return;
+    const codeEl = card.querySelector("code");
+    if (!codeEl) return;
+    card.appendChild(makeCopyButton(() => codeEl.innerText));
   });
 
 })();
