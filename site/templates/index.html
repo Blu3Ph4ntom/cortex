@@ -4,7 +4,7 @@
 <div class="layout">
   <aside class="rail">
     <a href="{{ get_url(path='') }}" class="brandmark" aria-label="cortex home">
-      <span class="mark cortex-mark"></span>
+      {% include "partials/logo.html" %}
       <div class="word">cortex</div>
       <div class="kicker">Brain for codebases.</div>
     </a>
@@ -50,18 +50,23 @@
         GitHub
       </a>
 
-      <a class="external" href="{{ get_url(path='docs/') }}">Docs</a>
+      <a class="external" href="https://x.com/Im_BluePhantom" rel="noopener" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M18.9 3.5h3l-6.5 7.4 7.6 9.6h-6l-4.7-6-5.2 6h-3l7-8-7.3-9.1h6l4.2 5.4 4.9-5.4zm-1.1 15h1.7L7.2 5.4H5.5l12.3 13.1z"></path>
+        </svg>
+        @Im_BluePhantom
+      </a>
     </div>
   </aside>
 
   <div class="page">
     <section id="overview" class="panel-section is-active" aria-labelledby="overview-heading">
       <div class="panel-body">
-        <h1 id="overview-heading">Structural repository memory for AI coding agents.</h1>
+        <h1 id="overview-heading">Codebase memory for agents.</h1>
         <p class="lede">Cortex is a local-first code knowledge engine that turns a repository into a persistent semantic graph so agents can resolve symbol ownership, inspect callers, trace dependencies, and estimate impact with structural context instead of grep and guesswork.</p>
 
         <div class="cta">
-          <a class="btn primary" href="#install">Get Started</a>
+          <a class="btn primary" href="#quickstart">Get Started</a>
           <a class="btn external" href="{{ config.extra.repo }}" rel="noopener" target="_blank">GitHub</a>
         </div>
 

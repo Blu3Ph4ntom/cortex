@@ -68,45 +68,21 @@ body {
 }
 
 .mark,
-.brand-mark {
+.brand-mark,
+.logo-mark {
     width: 28px;
     height: 28px;
-    border: 1.5px solid var(--text);
-    background: transparent;
     display: inline-block;
-    position: relative;
     transition: transform var(--transition-bounce);
     cursor: pointer;
+    color: var(--text);
 }
 
 .brandmark:hover .mark,
-.brand-lockup:hover .brand-mark {
+.brand-lockup:hover .brand-mark,
+.brandmark:hover .logo-mark,
+.brand-lockup:hover .logo-mark {
     transform: rotate(90deg);
-}
-
-.mark::after,
-.brand-mark::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.mark::after {
-    width: 10px;
-    height: 10px;
-    border: 1.5px solid var(--text);
-    background: var(--bg);
-}
-
-.cortex-mark::after {
-    width: 11px;
-    height: 11px;
-    border: 1.5px solid var(--text);
-    border-right-color: transparent;
-    border-radius: 999px;
-    background: transparent;
 }
 
 .word,
@@ -264,11 +240,12 @@ body {
 }
 
 h1 {
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
-    line-height: 1.1;
+    font-size: clamp(2.1rem, 4.3vw, 3rem);
+    line-height: 1.03;
     margin: 0 0 24px;
     font-weight: 800;
     letter-spacing: -0.03em;
+    max-width: 13ch;
 }
 
 .lede,
@@ -538,6 +515,12 @@ pre:hover .copy-btn,
 
 .doc-article .content-section {
     border-bottom: none;
+}
+
+.redirect-shell {
+    width: min(720px, 92vw);
+    margin: 72px auto;
+    font-size: 14px;
 }
 
 @media (max-width: 900px) {
