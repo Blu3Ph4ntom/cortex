@@ -212,16 +212,12 @@ body {
 .panel-section {
     display: none;
     opacity: 0;
-    transform: translateY(12px);
-    transition:
-        opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.18s ease-out;
 }
 
 .panel-section.is-active {
     display: block;
     opacity: 1;
-    transform: translateY(0);
 }
 
 .nav-indicator {
@@ -385,6 +381,51 @@ h3 {
     position: relative;
 }
 
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin: 8px 0 20px;
+}
+
+.metric-card,
+.fact-item {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--code-bg);
+    padding: 18px 20px;
+}
+
+.metric-card span,
+.fact-item span {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+.metric-card strong {
+    display: block;
+    font-size: 1.3rem;
+    line-height: 1.1;
+    font-weight: 700;
+}
+
+.fact-list {
+    display: grid;
+    gap: 16px;
+}
+
+.fact-item p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    opacity: 0.78;
+}
+
 .quick .cmd:hover {
     border-color: var(--text);
 }
@@ -492,8 +533,7 @@ code {
     z-index: 10;
 }
 
-pre:hover .copy-btn,
-.quick .cmd:hover .copy-btn {
+pre:hover .copy-btn {
     opacity: 1;
 }
 
@@ -540,5 +580,9 @@ pre:hover .copy-btn,
 
     .rail-nav {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+
+    .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }

@@ -89,14 +89,33 @@
           </div>
         </div>
 
-        <div class="quick">
-          <div class="cmd">
-            <span>Current self-host stats</span>
-            <code>{{ config.extra.stats_files }} files / {{ config.extra.stats_symbols }} symbols / {{ config.extra.stats_edges }} edges</code>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span>Files</span>
+            <strong>{{ config.extra.stats_files }}</strong>
           </div>
-          <div class="cmd">
+          <div class="metric-card">
+            <span>Symbols</span>
+            <strong>{{ config.extra.stats_symbols }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>Edges</span>
+            <strong>{{ config.extra.stats_edges }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>Incoming / Outgoing</span>
+            <strong>{{ config.extra.stats_incoming }} / {{ config.extra.stats_outgoing }}</strong>
+          </div>
+        </div>
+
+        <div class="fact-list">
+          <div class="fact-item">
             <span>Observed result</span>
-            <code>find-symbol RepositorySession -> crates/cortex-core/src/indexer.rs</code>
+            <p><code>find-symbol RepositorySession</code> resolves directly to <code>crates/cortex-core/src/indexer.rs</code>.</p>
+          </div>
+          <div class="fact-item">
+            <span>Observed result</span>
+            <p><code>callers open_session</code> surfaces the CLI entrypoints that depend on it before a refactor.</p>
           </div>
         </div>
       </div>
@@ -314,15 +333,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1</code></pre>
 
   function activateSection(id, replaceHash = true) {
     sections.forEach((sec) => {
-      if (sec.id === id) {
-        sec.style.display = "block";
-        requestAnimationFrame(() => sec.classList.add("is-active"));
-      } else {
-        sec.classList.remove("is-active");
-        setTimeout(() => {
-          if (!sec.classList.contains("is-active")) sec.style.display = "none";
-        }, 450);
-      }
+      const active = sec.id === id;
+      sec.classList.toggle("is-active", active);
+      sec.style.display = active ? "block" : "none";
     });
 
     navLinks.forEach((link) => {
@@ -389,12 +402,6 @@ powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1</code></pre>
     pre.appendChild(makeCopyButton(() => (codeEl ? codeEl.innerText : pre.innerText)));
   });
 
-  document.querySelectorAll(".cmd").forEach((cmd) => {
-    if (cmd.querySelector(".copy-btn")) return;
-    const codeEl = cmd.querySelector("code");
-    if (!codeEl) return;
-    cmd.appendChild(makeCopyButton(() => codeEl.innerText));
-  });
 })();
 </script>
 {% endblock content %}

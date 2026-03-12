@@ -1,27 +1,38 @@
 ---
 name: cortex
-description: Working guide for contributors and coding agents in the Cortex repository. Use when changing the Rust graph engine, CLI, daemon, installers, docs, or Zola site.
+description: Production-oriented repository skill for Cortex. Use when modifying the graph engine, CLI, daemon, installers, or single-page Zola site.
 ---
 
-# Cortex Repository Guide
+# Cortex Skill
 
-## What This Repo Is
+Use this skill when working inside the Cortex repository.
+
+## What Cortex Is
 
 Cortex is a local-first code knowledge engine for AI agents and developers. It indexes a repository into a persistent semantic graph and exposes that graph through:
 
-- `cortex-core`: graph model, extractors, indexer, storage, query engine
-- `cortex-cli`: local CLI
-- `cortex-daemon`: local HTTP daemon
-- `site/`: Zola single-page website
+- `cortex-core`
+- `cortex-cli`
+- `cortex-daemon`
+- `site/`
 
 ## Working Rules
 
 - Preserve the public positioning: useful OSS beta, not compiler-grade semantic truth.
-- Keep the repo local-first. Do not add hosted-service assumptions to the core product.
-- Treat the website as a single-page docs and landing surface. Avoid reintroducing separate docs UX.
-- Keep install commands real. Any public docs change should reflect commands that were actually validated.
+- Keep the repo local-first.
+- Keep the website single-page with section navigation.
+- Only terminal and API command blocks should get copy buttons in the UI.
+- Keep README and site copy public-facing and concrete.
 
-## Core Commands
+## Repository Map
+
+- `crates/cortex-core`: graph model, extractors, indexer, store, query engine
+- `crates/cortex-cli`: CLI interface
+- `crates/cortex-daemon`: local HTTP daemon
+- `site/`: Zola marketing/docs surface
+- `scripts/`: install and self-test scripts
+
+## Validation Commands
 
 Use the MSVC toolchain on this Windows machine:
 
@@ -36,7 +47,7 @@ For self-host verification:
 powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1
 ```
 
-## Website Commands
+## Website Workflow
 
 Zola is installed via WinGet and is not guaranteed to be on `PATH`. Use:
 
@@ -67,16 +78,9 @@ If Playwright’s default browser binary is missing, pass the installed Chromium
 agent-browser --session cortex --executable-path "$env:LOCALAPPDATA\ms-playwright\chromium-1208\chrome-win64\chrome.exe" open http://127.0.0.1:1111
 ```
 
-## Content Standards
-
-- README should read like public developer documentation.
-- Site copy should be concrete, not hype-heavy.
-- Any claims about usefulness should come from actual runs against this repository or other tested repos.
-- Keep the left rail and section rhythm aligned with the `port0` website model.
-
 ## Release Surface
 
-If changing install or release behavior, also inspect:
+If changing install or release behavior, inspect:
 
 - `.github/workflows/release.yml`
 - `scripts/install.sh`
