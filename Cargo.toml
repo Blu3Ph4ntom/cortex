@@ -12,8 +12,8 @@ license = "MIT"
 version = "0.1.0"
 authors = ["blu3ph4ntom"]
 repository = "https://github.com/blu3ph4ntom/cortex"
-homepage = "https://cortex.bluephantom.dev"
-documentation = "https://cortex.bluephantom.dev/docs/"
+homepage = "https://blu3ph4ntom.github.io/cortex/"
+documentation = "https://blu3ph4ntom.github.io/cortex/#quickstart"
 
 [workspace.dependencies]
 anyhow = "1.0.100"

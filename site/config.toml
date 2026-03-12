@@ -13,7 +13,6 @@ smart_punctuation = true
 [extra]
 repo = "https://github.com/blu3ph4ntom/cortex"
 docs_repo = "https://github.com/blu3ph4ntom/cortex/tree/main/site"
-domain = "cortex.bluephantom.dev"
 tagline = "Brain for codebases"
 stats_files = 9
 stats_symbols = 165
