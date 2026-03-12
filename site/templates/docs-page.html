@@ -1,38 +1,125 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main class="page-shell">
-  <aside class="sidebar">
-    <a class="brand-lockup" href="{{ get_url(path='') }}">
-      <span class="brand-mark"></span>
-      <span class="brand-name">cortex</span>
+<div class="layout docs-layout">
+  <aside class="rail">
+    <a href="{{ get_url(path='') }}" class="brandmark" aria-label="cortex home">
+      <span class="mark cortex-mark"></span>
+      <div class="word">cortex</div>
+      <div class="kicker">Brain for codebases.</div>
     </a>
-    <p class="tagline">BRAIN FOR CODEBASES.</p>
 
-    <div class="theme-switch" aria-hidden="true">
-      <span class="switch-button active">□</span>
-      <span class="switch-button">◌</span>
-      <span class="switch-button">◐</span>
+    <div class="theme-switch" role="group" aria-label="Theme selection">
+      <button class="theme-option" type="button" data-theme-mode="system" aria-label="System theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+      </button>
+      <button class="theme-option" type="button" data-theme-mode="light" aria-label="Light theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+        </svg>
+      </button>
+      <button class="theme-option" type="button" data-theme-mode="dark" aria-label="Dark theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
     </div>
 
     {% set docs = get_section(path="docs/_index.md") %}
     <nav class="rail-nav">
+      <div class="nav-indicator" aria-hidden="true"></div>
       {% for child in docs.pages %}
-        <a href="{{ child.permalink }}" class="{% if page.title == child.title %}active{% endif %}">{{ child.title }}</a>
+        <a href="{{ child.permalink }}" class="{% if page.title == child.title %}is-active{% endif %}"><span class="nav-text">{{ child.title }}</span></a>
       {% endfor %}
     </nav>
 
-    <div class="sidebar-footer">
-      <a href="{{ config.extra.repo }}">GitHub</a>
-      <a href="{{ get_url(path='') }}">Overview</a>
+    <div class="rail-links">
+      <a class="external" href="{{ config.extra.repo }}" rel="noopener" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C6.5 2 2 6.6 2 12.2c0 4.4 2.9 8.1 6.9 9.4.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.4-3.4-1.4-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 0 1.6 1.1 1.6 1.1.9 1.6 2.4 1.1 3 .8.1-.7.4-1.1.7-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.5-1.2.1-2.6 0 0 .8-.3 2.7 1a9.1 9.1 0 0 1 4.9 0c1.9-1.3 2.7-1 2.7-1 .6 1.4.2 2.3.1 2.6.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.7 5 .4.3.8 1 .8 2.1v3.1c0 .3.2.6.7.5 4-1.3 6.9-5 6.9-9.4C22 6.6 17.5 2 12 2z"></path>
+        </svg>
+        GitHub
+      </a>
+      <a href="{{ get_url(path='') }}#overview">Overview</a>
     </div>
   </aside>
 
-  <article class="content-column prose doc-article">
-    <section class="content-section">
+  <article class="page prose doc-article doc-page">
+    <section class="panel-section is-active docs-panel">
+      <div class="panel-body">
       <h1>{{ page.title }}</h1>
       {{ page.content | safe }}
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.docs_repo }}/content/docs/{{ page.slug }}.md" rel="noopener" target="_blank">Edit on GitHub</a>
+      </div>
     </section>
   </article>
-</main>
+</div>
+
+<script>
+(function () {
+  const root = document.documentElement;
+  const storageKey = "cortex-theme-mode";
+  const themeOptions = document.querySelectorAll(".theme-option");
+  const nav = document.querySelector(".rail-nav");
+  const indicator = document.querySelector(".nav-indicator");
+  const active = document.querySelector(".rail-nav a.is-active");
+
+  function applyTheme(mode) {
+    if (mode === "system") {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      root.setAttribute("data-theme", prefersDark ? "dark" : "light");
+    } else {
+      root.setAttribute("data-theme", mode);
+    }
+
+    localStorage.setItem(storageKey, mode);
+    themeOptions.forEach((opt) => opt.classList.toggle("is-active", opt.dataset.themeMode === mode));
+  }
+
+  function setIndicatorToLink(link) {
+    if (!indicator || !nav || !link) return;
+    const textEl = link.querySelector(".nav-text") || link;
+    const navRect = nav.getBoundingClientRect();
+    const textRect = textEl.getBoundingClientRect();
+    const dotRect = indicator.getBoundingClientRect();
+    const dotSize = dotRect.height || 4;
+    const centerY = (textRect.top + textRect.bottom) / 2;
+    const y = centerY - navRect.top - dotSize / 2;
+    indicator.style.opacity = "1";
+    indicator.style.transform = `translateY(${Math.max(0, y)}px)`;
+  }
+
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (localStorage.getItem(storageKey) === "system") applyTheme("system");
+  });
+
+  themeOptions.forEach((opt) => opt.addEventListener("click", () => applyTheme(opt.dataset.themeMode)));
+  applyTheme(localStorage.getItem(storageKey) || "dark");
+  setIndicatorToLink(active);
+  window.addEventListener("resize", () => setIndicatorToLink(document.querySelector(".rail-nav a.is-active")));
+
+  document.querySelectorAll("pre").forEach((pre) => {
+    if (pre.querySelector(".copy-btn")) return;
+    const codeEl = pre.querySelector("code");
+    const btn = document.createElement("button");
+    btn.className = "copy-btn";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Copy");
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(codeEl ? codeEl.innerText : pre.innerText);
+      } catch (_) {}
+    });
+    pre.appendChild(btn);
+  });
+})();
+</script>
 {% endblock content %}

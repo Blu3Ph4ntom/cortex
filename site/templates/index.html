@@ -1,180 +1,395 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main class="page-shell">
-  <aside class="sidebar">
-    <a class="brand-lockup" href="#overview">
-      <span class="brand-mark"></span>
-      <span class="brand-name">cortex</span>
+<div class="layout">
+  <aside class="rail">
+    <a href="{{ get_url(path='') }}" class="brandmark" aria-label="cortex home">
+      <span class="mark cortex-mark"></span>
+      <div class="word">cortex</div>
+      <div class="kicker">Brain for codebases.</div>
     </a>
-    <p class="tagline">BRAIN FOR CODEBASES.</p>
 
-    <div class="theme-switch" aria-hidden="true">
-      <span class="switch-button active">□</span>
-      <span class="switch-button">◌</span>
-      <span class="switch-button">◐</span>
+    <div class="theme-switch" role="group" aria-label="Theme selection">
+      <button class="theme-option" type="button" data-theme-mode="system" aria-label="System theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+      </button>
+      <button class="theme-option" type="button" data-theme-mode="light" aria-label="Light theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+        </svg>
+      </button>
+      <button class="theme-option" type="button" data-theme-mode="dark" aria-label="Dark theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
     </div>
 
-    <nav class="rail-nav">
-      <a href="#overview" class="active">Overview</a>
-      <a href="#install">Install</a>
-      <a href="#quick-start">Quick start</a>
-      <a href="#queries">Queries</a>
-      <a href="#daemon">Daemon</a>
-      <a href="#status">Status</a>
-      <a href="#contribute">Contributing</a>
+    <nav class="rail-nav" aria-label="Sections">
+      <div class="nav-indicator" aria-hidden="true"></div>
+      <a href="#overview" data-section="overview" class="is-active"><span class="nav-text">Overview</span></a>
+      <a href="#install" data-section="install"><span class="nav-text">Install</span></a>
+      <a href="#quickstart" data-section="quickstart"><span class="nav-text">Quick start</span></a>
+      <a href="#agent-workflows" data-section="agent-workflows"><span class="nav-text">Agent workflows</span></a>
+      <a href="#queries" data-section="queries"><span class="nav-text">Query model</span></a>
+      <a href="#daemon" data-section="daemon"><span class="nav-text">Daemon API</span></a>
+      <a href="#architecture" data-section="architecture"><span class="nav-text">Architecture</span></a>
+      <a href="#contributing" data-section="contributing"><span class="nav-text">Contributing</span></a>
     </nav>
 
-    <div class="sidebar-footer">
-      <a href="{{ config.extra.repo }}">GitHub</a>
-      <a href="{{ get_url(path='docs/') }}">Docs</a>
+    <div class="rail-links">
+      <a class="external" href="{{ config.extra.repo }}" rel="noopener" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C6.5 2 2 6.6 2 12.2c0 4.4 2.9 8.1 6.9 9.4.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.4-3.4-1.4-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 0 1.6 1.1 1.6 1.1.9 1.6 2.4 1.1 3 .8.1-.7.4-1.1.7-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.5-1.2.1-2.6 0 0 .8-.3 2.7 1a9.1 9.1 0 0 1 4.9 0c1.9-1.3 2.7-1 2.7-1 .6 1.4.2 2.3.1 2.6.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.7 5 .4.3.8 1 .8 2.1v3.1c0 .3.2.6.7.5 4-1.3 6.9-5 6.9-9.4C22 6.6 17.5 2 12 2z"></path>
+        </svg>
+        GitHub
+      </a>
+
+      <a class="external" href="{{ get_url(path='docs/') }}">Docs</a>
     </div>
   </aside>
 
-  <div class="content-column">
-    <section id="overview" class="content-section hero-section">
-      <h1>Structural repository memory for AI coding agents.</h1>
-      <p class="hero-copy">
-        Cortex indexes a repository into a persistent semantic graph so tools can resolve symbols,
-        inspect callers, trace dependencies, and estimate impact with structural awareness instead of text-search guesswork.
-      </p>
-      <div class="hero-actions">
-        <a class="primary-button" href="#install">Get Started</a>
-        <a class="secondary-button" href="{{ config.extra.repo }}">GitHub</a>
-      </div>
+  <div class="page">
+    <section id="overview" class="panel-section is-active" aria-labelledby="overview-heading">
+      <div class="panel-body">
+        <h1 id="overview-heading">Structural repository memory for AI coding agents.</h1>
+        <p class="lede">Cortex is a local-first code knowledge engine that turns a repository into a persistent semantic graph so agents can resolve symbol ownership, inspect callers, trace dependencies, and estimate impact with structural context instead of grep and guesswork.</p>
 
-      <div class="feature-grid">
-        <article>
-          <h3>Local-first graph</h3>
-          <p>Persistent embedded storage with no hosted dependency or external graph service required.</p>
-        </article>
-        <article>
-          <h3>Agent-facing queries</h3>
-          <p>Resolve symbols, callers, references, dependencies, and bounded impact through stable command/query shapes.</p>
-        </article>
-        <article>
-          <h3>Polyglot support</h3>
-          <p>Indexes Rust, JavaScript, TypeScript, Python, and Go repositories from a single local workspace.</p>
-        </article>
-        <article>
-          <h3>CLI and daemon</h3>
-          <p>Use the CLI directly or query the local HTTP daemon from editors, agents, and automation systems.</p>
-        </article>
+        <div class="cta">
+          <a class="btn primary" href="#install">Get Started</a>
+          <a class="btn external" href="{{ config.extra.repo }}" rel="noopener" target="_blank">GitHub</a>
+        </div>
+
+        <div class="features">
+          <div class="feature-item">
+            <h4>Local graph store</h4>
+            <p>No hosted service required. Cortex builds and persists the semantic graph on your machine and queries it in-place.</p>
+          </div>
+          <div class="feature-item">
+            <h4>Structural queries</h4>
+            <p>Ask for symbol ownership, callers, references, dependencies, and bounded impact instead of grepping for identifiers.</p>
+          </div>
+          <div class="feature-item">
+            <h4>Polyglot support</h4>
+            <p>Indexes Rust, JavaScript, TypeScript, Python, and Go repositories from one local workspace and normalizes them into one graph.</p>
+          </div>
+          <div class="feature-item">
+            <h4>CLI and daemon</h4>
+            <p>Use the CLI directly or expose the graph through a local HTTP daemon for agents, editors, and automation flows.</p>
+          </div>
+        </div>
+
+        <div class="quick">
+          <div class="cmd">
+            <span>Current self-host stats</span>
+            <code>{{ config.extra.stats_files }} files / {{ config.extra.stats_symbols }} symbols / {{ config.extra.stats_edges }} edges</code>
+          </div>
+          <div class="cmd">
+            <span>Observed result</span>
+            <code>find-symbol RepositorySession -> crates/cortex-core/src/indexer.rs</code>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.docs_repo }}/templates/index.html" rel="noopener" target="_blank">Edit on GitHub</a>
       </div>
     </section>
 
-    <section id="install" class="content-section">
-      <h2>Install</h2>
-      <h3 class="section-subtitle">ONE-LINE INSTALLER</h3>
-      <p class="section-copy">Download the latest release binary and install it into a common local path.</p>
-
-      <div class="code-stack">
-        <article class="code-panel">
-          <p class="label">MACOS / LINUX</p>
-          <pre><code>curl -fsSL https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.sh | sh</code></pre>
-        </article>
-        <article class="code-panel">
-          <p class="label">WINDOWS (POWERSHELL)</p>
-          <pre><code>iwr https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.ps1 -useb | iex</code></pre>
-        </article>
-      </div>
-
-      <h3 class="section-subtitle">BUILD FROM SOURCE</h3>
-      <div class="code-stack">
-        <article class="code-panel">
-          <p class="label">WITH CARGO</p>
-          <pre><code>git clone https://github.com/Blu3Ph4ntom/cortex.git
+    <section id="install" class="panel-section" aria-labelledby="install-heading">
+      <div class="panel-body">
+        <h2 id="install-heading">Install</h2>
+        <div class="grid">
+          <div>
+            <h3>One-line installer</h3>
+            <p>Detects OS and architecture, downloads the latest release binary, and installs it to a common local path.</p>
+            <div class="quick">
+              <div class="cmd">
+                <span>macOS / Linux</span>
+                <code>curl -fsSL https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.sh | sh</code>
+              </div>
+              <div class="cmd">
+                <span>Windows (PowerShell)</span>
+                <code>irm https://raw.githubusercontent.com/Blu3Ph4ntom/cortex/main/scripts/install.ps1 | iex</code>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3>Build from source</h3>
+            <div class="quick">
+              <div class="cmd">
+                <span>macOS / Linux / Windows</span>
+                <code>git clone https://github.com/Blu3Ph4ntom/cortex.git
 cd cortex
 cargo install --path crates/cortex-cli
-cargo install --path crates/cortex-daemon</code></pre>
-        </article>
+cargo install --path crates/cortex-daemon</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.docs_repo }}/templates/index.html" rel="noopener" target="_blank">Edit on GitHub</a>
       </div>
     </section>
 
-    <section id="quick-start" class="content-section">
-      <h2>Quick start</h2>
-      <p class="section-copy">Index a repository, ask structural questions, then run the daemon if you want another tool to consume the graph.</p>
-      <div class="code-stack">
-        <article class="code-panel">
-          <p class="label">FIRST INDEX</p>
-          <pre><code>cortex index --repo /path/to/repo</code></pre>
-        </article>
-        <article class="code-panel">
-          <p class="label">FIRST QUERIES</p>
-          <pre><code>cortex query --repo /path/to/repo find-symbol --name RepositorySession
+    <section id="quickstart" class="panel-section" aria-labelledby="quickstart-heading">
+      <div class="panel-body">
+        <h2 id="quickstart-heading">Quick start</h2>
+        <p>Index a repository, then query the graph for ownership and blast radius before you edit code.</p>
+        <pre><code>cortex index --repo /path/to/repo
+cortex query --repo /path/to/repo find-symbol --name RepositorySession
 cortex query --repo /path/to/repo callers --target open_session
 cortex query --repo /path/to/repo dependencies --target RepositorySession --direction both --depth 1</code></pre>
-        </article>
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.docs_repo }}/content/docs/getting-started.md" rel="noopener" target="_blank">Edit on GitHub</a>
       </div>
     </section>
 
-    <section id="queries" class="content-section">
-      <h2>Queries</h2>
-      <p class="section-copy">Cortex currently exposes machine-readable query families for structural navigation and pre-edit context.</p>
-      <div class="feature-grid">
-        <article>
-          <h3>find-symbol</h3>
-          <p>Resolve the canonical owner of a symbol instead of sifting through mentions.</p>
-        </article>
-        <article>
-          <h3>callers / callees</h3>
-          <p>Trace call relationships before editing helpers, APIs, or leaf functions.</p>
-        </article>
-        <article>
-          <h3>dependencies</h3>
-          <p>Inspect inbound and outbound neighbors around a symbol or file.</p>
-        </article>
-        <article>
-          <h3>impact / explain</h3>
-          <p>Summarize likely blast radius and generate compressed structural context for an agent prompt.</p>
-        </article>
+    <section id="agent-workflows" class="panel-section" aria-labelledby="agent-workflows-heading">
+      <div class="panel-body">
+        <h2 id="agent-workflows-heading">Agent workflows</h2>
+        <div class="features">
+          <div class="feature-item">
+            <h4>Pre-edit orientation</h4>
+            <p>Resolve the actual owner of a type, helper, or module before the agent starts editing an unfamiliar repository.</p>
+          </div>
+          <div class="feature-item">
+            <h4>Refactor safety</h4>
+            <p>Ask who calls a symbol and what depends on it before renames, extractions, or signature changes.</p>
+          </div>
+          <div class="feature-item">
+            <h4>Patch review context</h4>
+            <p>Surface nearby callers, callees, and references so review summaries are grounded in structure rather than filename guesses.</p>
+          </div>
+          <div class="feature-item">
+            <h4>Local toolchain integration</h4>
+            <p>Use the daemon from agents, editors, and automation without standing up a hosted graph service.</p>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.docs_repo }}/README.md" rel="noopener" target="_blank">Edit on GitHub</a>
       </div>
     </section>
 
-    <section id="daemon" class="content-section">
-      <h2>Daemon</h2>
-      <p class="section-copy">Run a local HTTP service when another process needs to query Cortex without shelling out each time.</p>
-      <div class="code-stack">
-        <article class="code-panel">
-          <p class="label">START DAEMON</p>
-          <pre><code>cortexd --repo /path/to/repo --bind 127.0.0.1:8787</code></pre>
-        </article>
-        <article class="code-panel">
-          <p class="label">EXAMPLE</p>
-          <pre><code>curl "http://127.0.0.1:8787/graph/find_symbol?name=RepositorySession"</code></pre>
-        </article>
+    <section id="queries" class="panel-section" aria-labelledby="queries-heading">
+      <div class="panel-body">
+        <h2 id="queries-heading">Query model</h2>
+        <div class="grid">
+          <div>
+            <ul>
+              <li><code>find-symbol &lt;name&gt;</code> — resolve the canonical owner of a symbol</li>
+              <li><code>dependencies &lt;target&gt;</code> — inspect inbound and outbound structural neighbors</li>
+              <li><code>callers &lt;target&gt;</code> — find the functions or commands that invoke a helper</li>
+            </ul>
+          </div>
+          <div>
+            <ul>
+              <li><code>callees &lt;target&gt;</code> — walk outward from a function into what it invokes</li>
+              <li><code>references &lt;target&gt;</code> — inspect best-effort identifier references</li>
+              <li><code>impact &lt;target&gt;</code> / <code>explain &lt;target&gt;</code> — summarize likely blast radius and structural context</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.docs_repo }}/content/docs/queries.md" rel="noopener" target="_blank">Edit on GitHub</a>
       </div>
     </section>
 
-    <section id="status" class="content-section">
-      <h2>Status</h2>
-      <div class="feature-grid">
-        <article>
-          <h3>Useful now</h3>
-          <p>Local structural awareness, review preparation, refactor safety checks, and agent context building.</p>
-        </article>
-        <article>
-          <h3>Measured on this repo</h3>
-          <p>{{ config.extra.stats_files }} files, {{ config.extra.stats_symbols }} symbols, and {{ config.extra.stats_edges }} edges in the current self-hosted run.</p>
-        </article>
-        <article>
-          <h3>Current limitation</h3>
-          <p>Analysis is conservative and syntax-driven. It is not yet compiler-grade or semantics-complete.</p>
-        </article>
-        <article>
-          <h3>Best fit</h3>
-          <p>Best for local developer workflows, editor tooling, and AI agents that need better repository memory.</p>
-        </article>
+    <section id="daemon" class="panel-section" aria-labelledby="daemon-heading">
+      <div class="panel-body">
+        <h2 id="daemon-heading">Daemon API</h2>
+        <p>Run the local HTTP daemon when another process needs repeated graph access without shelling out for every query.</p>
+        <pre><code>cortexd --repo /path/to/repo --bind 127.0.0.1:8787
+curl "http://127.0.0.1:8787/graph/find_symbol?name=RepositorySession"
+curl "http://127.0.0.1:8787/graph/callers?target=open_session"</code></pre>
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.repo }}/tree/main/crates/cortex-daemon" rel="noopener" target="_blank">Edit on GitHub</a>
       </div>
     </section>
 
-    <section id="contribute" class="content-section">
-      <h2>Contributing</h2>
-      <p class="section-copy">Cortex is an open-source Rust monorepo. Start with the README, docs, and contribution guide, then run the test and self-test flows locally.</p>
-      <div class="footer-meta">
-        <a href="{{ config.extra.repo }}">Edit on GitHub</a>
+    <section id="architecture" class="panel-section" aria-labelledby="architecture-heading">
+      <div class="panel-body">
+        <h2 id="architecture-heading">Architecture</h2>
+        <div class="grid">
+          <div>
+            <h3>Core crates</h3>
+            <ul>
+              <li><code>cortex-core</code> — indexer, graph store, extractors, and query engine</li>
+              <li><code>cortex-cli</code> — local command-line interface</li>
+              <li><code>cortex-daemon</code> — local HTTP serving layer</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Current tradeoff</h3>
+            <p>The graph is intentionally conservative and syntax-driven. It is already useful for navigation, review context, and bounded impact analysis, but it is not compiler-grade proof.</p>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.docs_repo }}/content/docs/architecture.md" rel="noopener" target="_blank">Edit on GitHub</a>
+      </div>
+    </section>
+
+    <section id="contributing" class="panel-section" aria-labelledby="contributing-heading">
+      <div class="panel-body">
+        <h2 id="contributing-heading">Contributing</h2>
+        <div class="grid">
+          <div>
+            <h3>Developer workflow</h3>
+            <pre><code>cargo fmt
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test --all-targets
+powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1</code></pre>
+          </div>
+          <div>
+            <h3>Current status</h3>
+            <p>Cortex is a public OSS beta. It is already useful for local structural awareness and agent workflows, but not yet production-hardened for broad autonomous editing across arbitrary repositories.</p>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <a class="edit-link external" href="{{ config.extra.repo }}/blob/main/CONTRIBUTING.md" rel="noopener" target="_blank">Edit on GitHub</a>
       </div>
     </section>
   </div>
-</main>
+</div>
+
+<script>
+(function () {
+  const root = document.documentElement;
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
+  const storageKey = "cortex-theme-mode";
+  const themeOptions = document.querySelectorAll(".theme-option");
+  const nav = document.querySelector(".rail-nav");
+  const indicator = document.querySelector(".nav-indicator");
+  const navLinks = Array.from(document.querySelectorAll(".rail-nav a"));
+  const sections = Array.from(document.querySelectorAll(".panel-section"));
+
+  function applyTheme(mode) {
+    if (mode === "system") {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      root.setAttribute("data-theme", prefersDark ? "dark" : "light");
+    } else {
+      root.setAttribute("data-theme", mode);
+    }
+
+    localStorage.setItem(storageKey, mode);
+    themeOptions.forEach((opt) => opt.classList.toggle("is-active", opt.dataset.themeMode === mode));
+  }
+
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (localStorage.getItem(storageKey) === "system") applyTheme("system");
+  });
+
+  themeOptions.forEach((opt) => opt.addEventListener("click", () => applyTheme(opt.dataset.themeMode)));
+  applyTheme(localStorage.getItem(storageKey) || "dark");
+
+  function setIndicatorToLink(link) {
+    if (!indicator || !nav || !link) return;
+    const textEl = link.querySelector(".nav-text") || link;
+    const navRect = nav.getBoundingClientRect();
+    const textRect = textEl.getBoundingClientRect();
+    const dotRect = indicator.getBoundingClientRect();
+    const dotSize = dotRect.height || 4;
+    const centerY = (textRect.top + textRect.bottom) / 2;
+    const y = centerY - navRect.top - dotSize / 2;
+    indicator.style.opacity = "1";
+    indicator.style.transform = `translateY(${Math.max(0, y)}px)`;
+  }
+
+  function activateSection(id, replaceHash = true) {
+    sections.forEach((sec) => {
+      if (sec.id === id) {
+        sec.style.display = "block";
+        requestAnimationFrame(() => sec.classList.add("is-active"));
+      } else {
+        sec.classList.remove("is-active");
+        setTimeout(() => {
+          if (!sec.classList.contains("is-active")) sec.style.display = "none";
+        }, 450);
+      }
+    });
+
+    navLinks.forEach((link) => {
+      const active = link.getAttribute("href") === "#" + id;
+      link.classList.toggle("is-active", active);
+      if (active) setIndicatorToLink(link);
+    });
+
+    if (replaceHash) history.replaceState(null, null, "#" + id);
+  }
+
+  navLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      activateSection(link.getAttribute("href").slice(1), false);
+    });
+  });
+
+  function syncFromHash() {
+    const hash = (window.location.hash || "").replace(/^#/, "");
+    const defaultId = "overview";
+    const id = hash && document.getElementById(hash) ? hash : defaultId;
+    activateSection(id, false);
+  }
+
+  window.addEventListener("hashchange", syncFromHash);
+  window.addEventListener("resize", () => {
+    const active = navLinks.find((link) => link.classList.contains("is-active"));
+    if (active) setIndicatorToLink(active);
+  });
+
+  syncFromHash();
+
+  function makeCopyButton(getText) {
+    const btn = document.createElement("button");
+    btn.className = "copy-btn";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Copy");
+
+    const iconCopy = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    const iconDone = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    btn.innerHTML = iconCopy;
+
+    btn.addEventListener("click", async () => {
+      const text = (getText() || "").trim();
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.classList.add("copied");
+        btn.innerHTML = iconDone;
+        window.setTimeout(() => {
+          btn.classList.remove("copied");
+          btn.innerHTML = iconCopy;
+        }, 1600);
+      } catch (_) {}
+    });
+
+    return btn;
+  }
+
+  document.querySelectorAll("pre").forEach((pre) => {
+    if (pre.querySelector(".copy-btn")) return;
+    const codeEl = pre.querySelector("code");
+    pre.appendChild(makeCopyButton(() => (codeEl ? codeEl.innerText : pre.innerText)));
+  });
+
+  document.querySelectorAll(".cmd").forEach((cmd) => {
+    if (cmd.querySelector(".copy-btn")) return;
+    const codeEl = cmd.querySelector("code");
+    if (!codeEl) return;
+    cmd.appendChild(makeCopyButton(() => codeEl.innerText));
+  });
+})();
+</script>
 {% endblock content %}
