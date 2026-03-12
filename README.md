@@ -85,6 +85,14 @@ Default install locations:
 - Unix: `~/.local/bin`
 - Windows: `$HOME\.cortex\bin`
 
+Windows release-installer behavior:
+
+- installs `cortex.exe` and `cortexd.exe` into `$HOME\.cortex\bin` by default
+- adds that directory to the current PowerShell session PATH immediately
+- adds that directory to the user PATH for new shells unless `CORTEX_INSTALL_DIR` is explicitly set
+
+If you set `CORTEX_INSTALL_DIR`, the installer will use that directory but will not persist it into the user PATH automatically.
+
 ### Install from source
 
 ```bash

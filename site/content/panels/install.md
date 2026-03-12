@@ -32,7 +32,11 @@ cargo install --path crates/cortex-daemon</code>
     <p>The release installers place binaries in a common local path: <code>~/.local/bin</code> on Unix and <code>$HOME\.cortex\bin</code> on Windows.</p>
   </div>
   <div class="fact-item">
+    <span>Windows PATH behavior</span>
+    <p>The PowerShell installer adds the default install directory to the current session PATH immediately and persists it for new shells. If you set <code>CORTEX_INSTALL_DIR</code>, it uses that directory but leaves your user PATH unchanged.</p>
+  </div>
+  <div class="fact-item">
     <span>Windows toolchain</span>
-    <p>Use the MSVC Rust toolchain if your GNU installation does not include <code>gcc.exe</code> and <code>dlltool.exe</code>.</p>
+    <p>Build from source with the MSVC Rust toolchain if your GNU installation does not include <code>gcc.exe</code> and <code>dlltool.exe</code>.</p>
   </div>
 </div>
