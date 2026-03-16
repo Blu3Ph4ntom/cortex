@@ -172,6 +172,8 @@ pub struct IndexStats {
     pub file_count: usize,
     pub symbol_count: usize,
     pub edge_count: usize,
+    /// Bytes reclaimed during auto-compaction (if any).
+    pub bytes_reclaimed: Option<u64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

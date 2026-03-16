@@ -57,6 +57,16 @@ impl SledGraphStore {
         std::fs::write(snapshot_path, bytes)?;
         Ok(())
     }
+    /// Compact the database by reloading and rewriting state.
+    /// This reclaims space from accumulated blob segments.
+    pub fn compact(&self) -> Result<u64, CortexError> {
+        let size_before = self.db.size_on_disk()?;
+        let state = self.load_state()?;
+        self.db.flush()?;
+        self.save_state(&state)?;
+        let size_after = self.db.size_on_disk()?;
+        Ok(size_before.saturating_sub(size_after))
+    }
 }
 
 /// A read-only view of the persisted graph state loaded from the JSON

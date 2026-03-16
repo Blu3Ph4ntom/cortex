@@ -180,7 +180,9 @@ impl Indexer {
         };
         state.graph = build_graph(self.session.repo_path(), &state.documents);
         self.session.store().save_state(&state)?;
-        Ok(index_stats(&state))
+        // Auto-compaction to reclaim space from fragmented sled blobs.
+        let bytes_reclaimed = self.session.store().compact().ok();
+        Ok(index_stats(&state, bytes_reclaimed))
     }
 }
 
@@ -204,7 +206,7 @@ fn should_skip(entry: &DirEntry) -> bool {
     )
 }
 
-fn index_stats(state: &PersistedState) -> IndexStats {
+fn index_stats(state: &PersistedState, bytes_reclaimed: Option<u64>) -> IndexStats {
     IndexStats {
         revision: state.revision,
         file_count: state.documents.len(),
@@ -215,6 +217,7 @@ fn index_stats(state: &PersistedState) -> IndexStats {
             .filter(|node| node.kind == GraphNodeKind::Symbol)
             .count(),
         edge_count: state.graph.edges.len(),
+        bytes_reclaimed,
     }
 }
 
