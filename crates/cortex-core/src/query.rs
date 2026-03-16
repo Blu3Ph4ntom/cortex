@@ -298,16 +298,19 @@ impl QueryEngine {
                 }
 
                 if let Some(path) = &node.path
-                    && normalize_path(path).contains(&q) {
-                        score += 30;
-                        reasons.push("file path match");
-                    }
+                    && normalize_path(path).contains(&q)
+                {
+                    score += 30;
+                    reasons.push("file path match");
+                }
 
                 if let Some(fq) = &node.fq_name
-                    && fq.to_ascii_lowercase().contains(&q) && !reasons.contains(&"name match") {
-                        score += 20;
-                        reasons.push("qualified name match");
-                    }
+                    && fq.to_ascii_lowercase().contains(&q)
+                    && !reasons.contains(&"name match")
+                {
+                    score += 20;
+                    reasons.push("qualified name match");
+                }
 
                 match node.symbol_kind {
                     Some(SymbolKind::Type)
@@ -435,9 +438,10 @@ impl QueryEngine {
                 .and_then(|n| n.path.as_ref());
             if let (Some(fp), Some(tp)) = (from_path, to_path)
                 && let (Some(fc), Some(tc)) = (find_crate(fp), find_crate(tp))
-                    && fc != tc {
-                        *edge_counts.entry((fc, tc)).or_default() += 1;
-                    }
+                && fc != tc
+            {
+                *edge_counts.entry((fc, tc)).or_default() += 1;
+            }
         }
 
         let edges: Vec<CrateEdge> = edge_counts
@@ -474,9 +478,10 @@ impl QueryEngine {
         let mut lang_counts: BTreeMap<String, usize> = BTreeMap::new();
         for node in self.state.graph.nodes.values() {
             if node.kind == GraphNodeKind::File
-                && let Some(lang) = node.language {
-                    *lang_counts.entry(lang.as_str().to_owned()).or_default() += 1;
-                }
+                && let Some(lang) = node.language
+            {
+                *lang_counts.entry(lang.as_str().to_owned()).or_default() += 1;
+            }
         }
         let mut languages: Vec<(String, usize)> = lang_counts.into_iter().collect();
         languages.sort_by(|a, b| b.1.cmp(&a.1));
@@ -525,9 +530,10 @@ impl QueryEngine {
         let mut file_symbol_counts: BTreeMap<PathBuf, usize> = BTreeMap::new();
         for node in self.state.graph.nodes.values() {
             if node.kind == GraphNodeKind::Symbol
-                && let Some(path) = &node.path {
-                    *file_symbol_counts.entry(path.clone()).or_default() += 1;
-                }
+                && let Some(path) = &node.path
+            {
+                *file_symbol_counts.entry(path.clone()).or_default() += 1;
+            }
         }
         let mut largest_files: Vec<(PathBuf, usize)> = file_symbol_counts.into_iter().collect();
         largest_files.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
@@ -637,10 +643,12 @@ fn extract_cargo_name(content: &str) -> Option<String> {
         if trimmed.starts_with('[') {
             in_package = false;
         }
-        if in_package && trimmed.starts_with("name")
-            && let Some(val) = trimmed.split_once('=').map(|x| x.1) {
-                return Some(val.trim().trim_matches('"').to_owned());
-            }
+        if in_package
+            && trimmed.starts_with("name")
+            && let Some(val) = trimmed.split_once('=').map(|x| x.1)
+        {
+            return Some(val.trim().trim_matches('"').to_owned());
+        }
     }
     None
 }

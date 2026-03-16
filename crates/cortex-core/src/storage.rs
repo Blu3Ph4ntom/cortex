@@ -40,7 +40,6 @@ impl SledGraphStore {
         &self.root
     }
 
-
     pub fn load_state(&self) -> Result<PersistedState, CortexError> {
         let Some(raw) = self.db.get(STATE_KEY)? else {
             return Ok(PersistedState::default());
