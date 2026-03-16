@@ -9,9 +9,8 @@ pub mod storage;
 pub use extractors::{DefaultExtractorRegistry, SemanticExtractor};
 pub use indexer::{Indexer, RepositorySession, RepositorySessionConfig};
 pub use model::{
-    DependencyDirection, Edge, EdgeKind, ExplainReport, GraphNode, GraphNodeKind, GraphSnapshot,
-    HealthReport, ImpactReport, IndexStats, Language, QueryFilter, QueryResult, ReferenceReport,
-    SymbolKind,
+    CrateEdge, CrateGraph, CrateNode, DependencyDirection, Edge, EdgeKind, ExplainReport,
+    GraphNode, GraphNodeKind, GraphSnapshot, HealthReport, ImpactReport, IndexStats, Language,
+    QueryFilter, QueryResult, ReferenceReport, RepositorySummary, SearchResult, SymbolKind,
 };
-pub use query::QueryEngine;
-pub use storage::{CortexError, SledGraphStore};
+pub use storage::{CortexError, ReadOnlyStore, SledGraphStore};

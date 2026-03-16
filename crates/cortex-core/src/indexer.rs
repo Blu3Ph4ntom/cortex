@@ -63,6 +63,10 @@ impl RepositorySession {
     }
 
     pub fn query_engine(&self) -> Result<QueryEngine, CortexError> {
+        // Try read-only path first (no sled lock), fall back to write path.
+        if let Some(ro) = crate::storage::ReadOnlyStore::load(self.store.as_ref().root())? {
+            return Ok(QueryEngine::new(ro.into_state()));
+        }
         let state = self.store.load_state()?;
         Ok(QueryEngine::new(state))
     }

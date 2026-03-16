@@ -9,7 +9,7 @@ resolver = "2"
 [workspace.package]
 edition = "2024"
 license = "MIT"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["blu3ph4ntom"]
 repository = "https://github.com/blu3ph4ntom/cortex"
 homepage = "https://blu3ph4ntom.github.io/cortex/"

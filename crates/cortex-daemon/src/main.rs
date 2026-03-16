@@ -137,6 +137,9 @@ async fn find_symbol(
             name: query.name,
             fq_name: query.fq_name,
             kind,
+            name_contains: None,
+            name_prefix: None,
+            limit: Some(50),
         })
     }))
 }

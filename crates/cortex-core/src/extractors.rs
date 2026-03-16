@@ -242,6 +242,8 @@ impl<'a> SymbolCollector<'a> {
                 }
                 "trait_item" => (SymbolKind::Trait, node.child_by_field_name("name")?),
                 "const_item" => (SymbolKind::Constant, node.child_by_field_name("name")?),
+                "impl_item" => (SymbolKind::Type, node.child_by_field_name("type")?),
+                "mod_item" => (SymbolKind::Module, node.child_by_field_name("name")?),
                 _ => return None,
             },
         };

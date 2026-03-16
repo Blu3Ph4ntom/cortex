@@ -187,6 +187,12 @@ pub struct QueryFilter {
     pub name: Option<String>,
     pub fq_name: Option<String>,
     pub kind: Option<SymbolKind>,
+    /// Case-insensitive substring match on symbol name.
+    pub name_contains: Option<String>,
+    /// Case-insensitive prefix match on symbol name.
+    pub name_prefix: Option<String>,
+    /// Maximum number of results to return (default: 50).
+    pub limit: Option<usize>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -220,6 +226,64 @@ pub struct ImpactReport {
 pub struct ExplainReport {
     pub target: GraphNode,
     pub summary: String,
+    pub incoming_edge_count: usize,
+    pub outgoing_edge_count: usize,
+    /// Up to 40 lines of the symbol's source definition.
+    pub source_snippet: Option<String>,
+    /// Up to 5 symbol names that call or reference this symbol.
+    pub top_callers: Vec<String>,
+    /// Up to 5 symbol names this symbol calls.
+    pub top_callees: Vec<String>,
+}
+
+/// A scored symbol search result.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SearchResult {
+    pub node: GraphNode,
+    /// 0–100, higher is a better match.
+    pub score: u8,
+    pub match_reason: String,
+}
+
+/// A crate/package node in the workspace dependency graph.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CrateNode {
+    pub name: String,
+    pub path: String,
+    pub file_count: usize,
+    pub symbol_count: usize,
+}
+
+/// A directed dependency between two crates.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CrateEdge {
+    pub from: String,
+    pub to: String,
+    /// Number of symbol-level edges that support this dependency.
+    pub evidence_count: usize,
+}
+
+/// Inter-crate dependency graph for a workspace.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CrateGraph {
+    pub crates: Vec<CrateNode>,
+    pub edges: Vec<CrateEdge>,
+}
+
+/// High-level architectural overview of a repository.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RepositorySummary {
+    pub file_count: usize,
+    pub symbol_count: usize,
+    pub edge_count: usize,
+    /// (language name, file count) pairs sorted by file count descending.
+    pub languages: Vec<(String, usize)>,
+    /// Up to top_n symbols sorted by inbound edge count descending.
+    pub top_referenced: Vec<(GraphNode, usize)>,
+    /// Symbols with zero inbound edges and Function kind (likely entry points).
+    pub entry_points: Vec<GraphNode>,
+    /// (path, symbol_count) pairs for the largest files, descending.
+    pub largest_files: Vec<(PathBuf, usize)>,
 }
 
 pub fn repo_node_id(repo_path: &Path) -> String {

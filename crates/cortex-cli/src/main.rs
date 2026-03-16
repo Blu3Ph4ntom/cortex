@@ -60,6 +60,12 @@ enum QueryCommand {
         fq_name: Option<String>,
         #[arg(long)]
         kind: Option<String>,
+        #[arg(long, help = "substring match on symbol name (case-insensitive)")]
+        name_contains: Option<String>,
+        #[arg(long, help = "prefix match on symbol name (case-insensitive)")]
+        name_prefix: Option<String>,
+        #[arg(long, default_value_t = 50, help = "max results to return")]
+        limit: usize,
     },
     Dependencies {
         #[arg(long)]
@@ -90,6 +96,17 @@ enum QueryCommand {
     Explain {
         #[arg(long)]
         target: String,
+    },
+    Search {
+        #[arg(long, help = "search query")]
+        query: String,
+        #[arg(long, default_value_t = 20, help = "max results")]
+        limit: usize,
+    },
+    CrateGraph {},
+    Summary {
+        #[arg(long, default_value_t = 10, help = "number of top items to show")]
+        top: usize,
     },
 }
 
@@ -133,12 +150,18 @@ fn run_query(repo: &Path, store_path: Option<&Path>, query: QueryCommand) -> Res
             name,
             fq_name,
             kind,
+            name_contains,
+            name_prefix,
+            limit,
         } => {
             let kind = kind.as_deref().and_then(SymbolKind::parse);
             print_json(engine.find_symbol(QueryFilter {
                 name,
                 fq_name,
                 kind,
+                name_contains,
+                name_prefix,
+                limit: Some(limit),
             })?)?;
         }
         QueryCommand::Dependencies {
@@ -158,6 +181,9 @@ fn run_query(repo: &Path, store_path: Option<&Path>, query: QueryCommand) -> Res
         QueryCommand::References { target } => print_json(engine.references(&target)?)?,
         QueryCommand::Impact { target, depth } => print_json(engine.impact(&target, depth)?)?,
         QueryCommand::Explain { target } => print_json(engine.explain(&target)?)?,
+        QueryCommand::Search { query, limit } => print_json(engine.search(&query, limit))?,
+        QueryCommand::CrateGraph {} => print_json(engine.crate_graph()?)?,
+        QueryCommand::Summary { top } => print_json(engine.summary(top))?,
     }
     Ok(())
 }
