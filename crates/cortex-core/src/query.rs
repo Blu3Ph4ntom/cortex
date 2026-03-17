@@ -4,7 +4,7 @@ use crate::model::{
     RepositorySummary, SearchResult, SymbolKind, normalize_path,
 };
 use crate::storage::CortexError;
-use std::collections::{BTreeMap, BTreeSet, VecDeque};
+use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
@@ -70,10 +70,10 @@ impl QueryEngine {
         depth: usize,
     ) -> Result<QueryResult, CortexError> {
         let target_id = self.resolve_target_id(target)?;
-        let mut visited = BTreeSet::new();
+        let mut visited = HashSet::new();
         let mut queue = VecDeque::from([(target_id.clone(), 0usize)]);
-        let mut node_ids = BTreeSet::from([target_id.clone()]);
-        let mut edge_ids = BTreeSet::new();
+        let mut node_ids = HashSet::from([target_id.clone()]);
+        let mut edge_ids = HashSet::new();
         while let Some((current, level)) = queue.pop_front() {
             if level >= depth || !visited.insert(current.clone()) {
                 continue;
@@ -138,8 +138,8 @@ impl QueryEngine {
         depth: usize,
     ) -> Result<crate::model::ImpactReport, CortexError> {
         let target_id = self.resolve_target_id(target)?;
-        let mut impacted = BTreeSet::new();
-        let mut supporting_edges = BTreeSet::new();
+        let mut impacted = HashSet::new();
+        let mut supporting_edges = HashSet::new();
         let mut queue = VecDeque::from([(target_id.clone(), 0usize)]);
 
         while let Some((current, level)) = queue.pop_front() {
@@ -208,9 +208,10 @@ impl QueryEngine {
             })
             .filter_map(|edge| self.state.graph.nodes.get(&edge.from))
             .map(|n| n.name.clone())
-            .collect::<BTreeSet<_>>()
+            .collect::<HashSet<_>>()
             .into_iter()
             .collect();
+        caller_names.sort();
         caller_names.truncate(5);
 
         // Top callees: nodes that this symbol Calls (up to 5, unique names).
@@ -222,9 +223,10 @@ impl QueryEngine {
             .filter(|edge| edge.kind == EdgeKind::Calls && edge.from == target_id)
             .filter_map(|edge| self.state.graph.nodes.get(&edge.to))
             .map(|n| n.name.clone())
-            .collect::<BTreeSet<_>>()
+            .collect::<HashSet<_>>()
             .into_iter()
             .collect();
+        callee_names.sort();
         callee_names.truncate(5);
 
         // Source snippet: read lines start_line..=end_line, cap at 40 lines.
@@ -389,8 +391,8 @@ impl QueryEngine {
         };
 
         // Count files and symbols per crate.
-        let mut file_counts: BTreeMap<String, usize> = BTreeMap::new();
-        let mut symbol_counts: BTreeMap<String, usize> = BTreeMap::new();
+        let mut file_counts: HashMap<String, usize> = HashMap::new();
+        let mut symbol_counts: HashMap<String, usize> = HashMap::new();
 
         for node in self.state.graph.nodes.values() {
             let Some(path) = &node.path else { continue };
@@ -419,7 +421,7 @@ impl QueryEngine {
             .collect();
 
         // Accumulate cross-crate dependency evidence.
-        let mut edge_counts: BTreeMap<(String, String), usize> = BTreeMap::new();
+        let mut edge_counts: HashMap<(String, String), usize> = HashMap::new();
         for edge in self.state.graph.edges.values() {
             if edge.kind != EdgeKind::DependsOn {
                 continue;
@@ -475,7 +477,7 @@ impl QueryEngine {
         let edge_count = self.state.graph.edges.len();
 
         // Language breakdown.
-        let mut lang_counts: BTreeMap<String, usize> = BTreeMap::new();
+        let mut lang_counts: HashMap<String, usize> = HashMap::new();
         for node in self.state.graph.nodes.values() {
             if node.kind == GraphNodeKind::File
                 && let Some(lang) = node.language
@@ -487,7 +489,7 @@ impl QueryEngine {
         languages.sort_by(|a, b| b.1.cmp(&a.1));
 
         // Inbound edge count per symbol node.
-        let mut inbound: BTreeMap<&str, usize> = BTreeMap::new();
+        let mut inbound: HashMap<&str, usize> = HashMap::new();
         for edge in self.state.graph.edges.values() {
             *inbound.entry(edge.to.as_str()).or_default() += 1;
         }
@@ -527,7 +529,7 @@ impl QueryEngine {
             .collect();
 
         // Largest files by symbol count.
-        let mut file_symbol_counts: BTreeMap<PathBuf, usize> = BTreeMap::new();
+        let mut file_symbol_counts: HashMap<PathBuf, usize> = HashMap::new();
         for node in self.state.graph.nodes.values() {
             if node.kind == GraphNodeKind::Symbol
                 && let Some(path) = &node.path
@@ -554,8 +556,8 @@ impl QueryEngine {
     where
         F: Fn(&Edge, &str) -> bool,
     {
-        let mut node_ids = BTreeSet::from([target_id.to_owned()]);
-        let mut edge_ids = BTreeSet::new();
+        let mut node_ids = HashSet::from([target_id.to_owned()]);
+        let mut edge_ids = HashSet::new();
 
         for edge in self
             .state
@@ -598,7 +600,7 @@ impl QueryEngine {
         Err(CortexError::NotFound(target.to_owned()))
     }
 
-    fn query_result(&self, node_ids: BTreeSet<String>, edge_ids: BTreeSet<String>) -> QueryResult {
+    fn query_result(&self, node_ids: HashSet<String>, edge_ids: HashSet<String>) -> QueryResult {
         QueryResult {
             nodes: node_ids
                 .iter()
