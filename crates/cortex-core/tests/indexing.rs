@@ -53,7 +53,8 @@ def keep():
     let indexer = Indexer::new(session.clone());
     indexer.build_full()?;
     fs::remove_file(&file)?;
-    let refreshed = indexer.refresh_paths(std::slice::from_ref(&file))?;
+    let delete_path = repo.join(".").join(file.file_name().expect("test file has a name"));
+    let refreshed = indexer.refresh_paths(std::slice::from_ref(&delete_path))?;
     assert_eq!(refreshed.file_count, 0);
     Ok(())
 }
