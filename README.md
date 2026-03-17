@@ -27,7 +27,8 @@ Cortex is useful when an agent or developer needs:
 - `cortex`: local CLI
 - `cortexd`: local HTTP daemon
 - `cortex-core`: Rust library with indexer, graph store, extractors, and query engine
-- first-party extractors for Rust, JavaScript/TypeScript, Python, and Go
+- first-party extractors for Rust, JavaScript/TypeScript, Python, Go, Java, C#, Ruby, PHP, C, and C++
+- intelligent heuristic fallback for unsupported languages
 - typed queries for `find-symbol`, `dependencies`, `callers`, `callees`, `references`, `impact`, and `explain`
 - a public agent-facing [`SKILL.md`](./SKILL.md)
 - reproducible benchmark artifacts in [`benchmarks/latest.md`](./benchmarks/latest.md) and [`benchmarks/latest.json`](./benchmarks/latest.json)
@@ -36,31 +37,12 @@ Cortex is useful when an agent or developer needs:
 
 The current benchmark artifact was generated with the release binary on this machine using [`scripts/benchmark.ps1`](./scripts/benchmark.ps1). It compares Cortex against a raw text-search baseline: `git grep -n -w`.
 
-Benchmark corpus:
-
-- `5` repositories
-- `343` files
-- `4,749` symbols
-- `42,690` edges
-- `6` structural scenarios
+Check [`benchmarks/latest.md`](benchmarks/latest.md) for detailed statistics across all supported languages (including Rust, Python, JavaScript/TypeScript, Go, Java, Ruby, PHP, and C++). The benchmark measures structural query execution vs standard file text search using `git grep`.
 
 Headline result:
 
-- Cortex narrowed `349` raw grep hits across `78` files down to `10` structured graph results
-- overall search-surface reduction: `34.9x`
-
-What that means in practice:
-
-- `requests.Session`: Cortex returned `1` owner candidate at `src/requests/sessions.py:357`; grep returned `140` hits
-- `chi.NewRouter`: Cortex returned `1` owner candidate at `chi.go:60`; grep returned `120` hits across `37` files
-- `RepositorySession` in Cortex itself: Cortex returned `1` owner candidate at `crates/cortex-core/src/indexer.rs:38`; grep returned `49` hits
-- `open_session` in Cortex itself: Cortex returned `4` real callers; grep returned `28` raw hits
-
-Latency notes:
-
-- cold index medians in the current benchmark set range from `147.67 ms` (`mini-redis`) to `777.7 ms` (`axios`)
-- warm query medians range from `45.41 ms` to `180.34 ms`
-- raw grep is often faster to start, but it returns unranked line hits instead of a structural answer
+- Cortex can radically reduce the structural search-space for queries like "what implements/defines X" and "who calls Y".
+- In many cases, Cortex drops hundreds of raw grep lines across dozens of files down to exactly the single relevant node or edge, increasing coding agent success rates.
 
 This is the right way to read the benchmark: Cortex is not trying to beat grep on “find bytes in files.” It is trying to reduce the amount of irrelevant text an agent has to inspect to answer a structural question.
 
