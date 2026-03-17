@@ -115,7 +115,7 @@ impl Indexer {
 
         let mut changed = false;
         for path in paths {
-            let canonical = fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
+            let canonical = canonicalize_refresh_path(path);
             if canonical.exists() && canonical.is_file() {
                 if let Some(language) = Language::from_path(&canonical) {
                     let extractor = self.session.extractors.for_language(language)?;
@@ -229,6 +229,16 @@ impl Indexer {
         let bytes_reclaimed = self.session.store().replace_store(&state).ok();
         Ok(index_stats(&state, bytes_reclaimed))
     }
+}
+
+fn canonicalize_refresh_path(path: &Path) -> PathBuf {
+    let canonical = fs::canonicalize(path).unwrap_or_else(|_| {
+        path.parent()
+            .and_then(|parent| fs::canonicalize(parent).ok())
+            .and_then(|parent| path.file_name().map(|name| parent.join(name)))
+            .unwrap_or_else(|| path.to_path_buf())
+    });
+    display_path(&canonical)
 }
 
 #[derive(Clone, Copy, Debug)]
