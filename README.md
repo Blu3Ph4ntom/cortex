@@ -27,42 +27,14 @@ Cortex is useful when an agent or developer needs:
 - `cortex`: local CLI
 - `cortexd`: local HTTP daemon
 - `cortex-core`: Rust library with indexer, graph store, extractors, and query engine
-- first-party extractors for Rust, JavaScript/TypeScript, Python, and Go
+- first-party extractors for Rust, JavaScript/TypeScript, Python, Go, Java, Kotlin, C#, C/C++, Swift, Objective-C, Ruby, PHP, Scala, Elixir, Erlang, Dart, Lua, R, Julia, Haskell, OCaml, Clojure, Bash, HTML, CSS, and YAML
+- unsupported extensions are skipped, and coverage for non-first-class languages is less complete and precise than first-party extractors
 - typed queries for `find-symbol`, `dependencies`, `callers`, `callees`, `references`, `impact`, and `explain`
 - a public agent-facing [`SKILL.md`](./SKILL.md)
-- reproducible benchmark artifacts in [`benchmarks/latest.md`](./benchmarks/latest.md) and [`benchmarks/latest.json`](./benchmarks/latest.json)
 
-## Benchmark snapshot
+## Benchmark results
 
-The current benchmark artifact was generated with the release binary on this machine using [`scripts/benchmark.ps1`](./scripts/benchmark.ps1). It compares Cortex against a raw text-search baseline: `git grep -n -w`.
-
-Benchmark corpus:
-
-- `5` repositories
-- `343` files
-- `4,749` symbols
-- `42,690` edges
-- `6` structural scenarios
-
-Headline result:
-
-- Cortex narrowed `349` raw grep hits across `78` files down to `10` structured graph results
-- overall search-surface reduction: `34.9x`
-
-What that means in practice:
-
-- `requests.Session`: Cortex returned `1` owner candidate at `src/requests/sessions.py:357`; grep returned `140` hits
-- `chi.NewRouter`: Cortex returned `1` owner candidate at `chi.go:60`; grep returned `120` hits across `37` files
-- `RepositorySession` in Cortex itself: Cortex returned `1` owner candidate at `crates/cortex-core/src/indexer.rs:38`; grep returned `49` hits
-- `open_session` in Cortex itself: Cortex returned `4` real callers; grep returned `28` raw hits
-
-Latency notes:
-
-- cold index medians in the current benchmark set range from `147.67 ms` (`mini-redis`) to `777.7 ms` (`axios`)
-- warm query medians range from `45.41 ms` to `180.34 ms`
-- raw grep is often faster to start, but it returns unranked line hits instead of a structural answer
-
-This is the right way to read the benchmark: Cortex is not trying to beat grep on “find bytes in files.” It is trying to reduce the amount of irrelevant text an agent has to inspect to answer a structural question.
+Latest benchmark summary (26 repos, 27 scenarios): 9087 files, 63161 symbols, 727716 edges. See [benchmarks/latest.md](./benchmarks/latest.md) and [benchmarks/latest.json](./benchmarks/latest.json).
 
 ## Installation
 
@@ -161,43 +133,6 @@ What the skill is for:
 
 `AGENTS.md` is different. It contains contributor instructions specific to working on the Cortex repository itself.
 
-## Field-tested repositories
-
-These runs were executed directly with Cortex during this release pass:
-
-- `Cortex` self-host: `13` files, `323` symbols, `2,914` edges; `RepositorySession` resolved to `crates/cortex-core/src/indexer.rs:38`; `open_session` impact returned `4` nodes and `12` supporting edges
-- `tokio-rs/mini-redis`: `27` files, `249` symbols, `2,254` edges; `Connection` resolved to `src/connection.rs:21`; `read_frame` surfaced `2` concrete callers
-- `psf/requests`: `36` files, `759` symbols, `5,373` edges; `Session` resolved to `src/requests/sessions.py:357`; impact returned `58` nodes and `116` supporting edges
-- `go-chi/chi`: `74` files, `433` symbols, `5,809` edges; `NewRouter` resolved to `chi.go:60`; impact returned `84` nodes and `252` supporting edges
-- `axios/axios`: `193` files, `2,985` symbols, `26,340` edges; `dispatchRequest` resolved to `lib/core/dispatchRequest.js:34`; impact connected it back to `Axios::_request`
-
-## Benchmarking Cortex yourself
-
-Build the release binary first:
-
-```bash
-cargo build --release
-```
-
-Then run the benchmark harness:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\benchmark.ps1
-```
-
-Outputs:
-
-- [`benchmarks/latest.md`](./benchmarks/latest.md): human-readable benchmark report
-- [`benchmarks/latest.json`](./benchmarks/latest.json): machine-readable benchmark data
-- [`site/data/benchmarks.json`](./site/data/benchmarks.json): website data source
-
-Current methodology:
-
-- cold index medians come from fresh stores
-- warm query medians reuse a prepared local store
-- the baseline is `git grep -n -w`
-- the benchmark focuses on structural tasks, not byte-search throughput
-
 ## HTTP API
 
 Daemon endpoints:
@@ -224,7 +159,6 @@ curl "http://127.0.0.1:8787/graph/find_symbol?name=RepositorySession"
 - `crates/cortex-cli`: CLI entrypoint and query commands
 - `crates/cortex-daemon`: local HTTP server for tool integrations
 - `site/`: Zola landing page and docs
-- `benchmarks/`: generated benchmark artifacts
 
 ## Development
 
@@ -241,6 +175,10 @@ Self-test:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\self-test.ps1
 ```
+
+## Storage compaction guarantee
+
+Cortex keeps a single live index per repository. Each index/refresh deterministically replaces the on-disk store atomically and removes prior store blobs, so no versioned index blobs are retained.
 
 ## Status and limitations
 

@@ -20,12 +20,19 @@ pub struct DefaultExtractorRegistry {
 
 impl Default for DefaultExtractorRegistry {
     fn default() -> Self {
-        let extractors: [(Language, Arc<dyn SemanticExtractor>); 4] = [
+        let extractors: [(Language, Arc<dyn SemanticExtractor>); 28] = [
             (
                 Language::JavaScript,
                 Arc::new(TreeSitterExtractor::new(
                     Language::JavaScript,
                     ParserLanguage::JavaScript,
+                )),
+            ),
+            (
+                Language::TypeScript,
+                Arc::new(TreeSitterExtractor::new(
+                    Language::TypeScript,
+                    ParserLanguage::TypeScript,
                 )),
             ),
             (
@@ -45,6 +52,119 @@ impl Default for DefaultExtractorRegistry {
                     Language::Rust,
                     ParserLanguage::Rust,
                 )),
+            ),
+            (
+                Language::Java,
+                Arc::new(TreeSitterExtractor::new(Language::Java, ParserLanguage::Java)),
+            ),
+            (
+                Language::Kotlin,
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Kotlin,
+                    ParserLanguage::Kotlin,
+                )),
+            ),
+            (
+                Language::CSharp,
+                Arc::new(TreeSitterExtractor::new(
+                    Language::CSharp,
+                    ParserLanguage::CSharp,
+                )),
+            ),
+            (
+                Language::C,
+                Arc::new(TreeSitterExtractor::new(Language::C, ParserLanguage::C)),
+            ),
+            (
+                Language::Cpp,
+                Arc::new(TreeSitterExtractor::new(Language::Cpp, ParserLanguage::Cpp)),
+            ),
+            (
+                Language::Swift,
+                Arc::new(TreeSitterExtractor::new(Language::Swift, ParserLanguage::Swift)),
+            ),
+            (
+                Language::ObjectiveC,
+                Arc::new(TreeSitterExtractor::new(
+                    Language::ObjectiveC,
+                    ParserLanguage::ObjectiveC,
+                )),
+            ),
+            (
+                Language::Ruby,
+                Arc::new(TreeSitterExtractor::new(Language::Ruby, ParserLanguage::Ruby)),
+            ),
+            (
+                Language::Php,
+                Arc::new(TreeSitterExtractor::new(Language::Php, ParserLanguage::Php)),
+            ),
+            (
+                Language::Scala,
+                Arc::new(TreeSitterExtractor::new(Language::Scala, ParserLanguage::Scala)),
+            ),
+            (
+                Language::Elixir,
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Elixir,
+                    ParserLanguage::Elixir,
+                )),
+            ),
+            (
+                Language::Erlang,
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Erlang,
+                    ParserLanguage::Erlang,
+                )),
+            ),
+            (
+                Language::Dart,
+                Arc::new(TreeSitterExtractor::new(Language::Dart, ParserLanguage::Dart)),
+            ),
+            (
+                Language::Lua,
+                Arc::new(TreeSitterExtractor::new(Language::Lua, ParserLanguage::Lua)),
+            ),
+            (
+                Language::R,
+                Arc::new(TreeSitterExtractor::new(Language::R, ParserLanguage::R)),
+            ),
+            (
+                Language::Julia,
+                Arc::new(TreeSitterExtractor::new(Language::Julia, ParserLanguage::Julia)),
+            ),
+            (
+                Language::Haskell,
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Haskell,
+                    ParserLanguage::Haskell,
+                )),
+            ),
+            (
+                Language::Ocaml,
+                Arc::new(TreeSitterExtractor::new(Language::Ocaml, ParserLanguage::Ocaml)),
+            ),
+            (
+                Language::Clojure,
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Clojure,
+                    ParserLanguage::Clojure,
+                )),
+            ),
+            (
+                Language::Bash,
+                Arc::new(TreeSitterExtractor::new(Language::Bash, ParserLanguage::Bash)),
+            ),
+            (
+                Language::Html,
+                Arc::new(TreeSitterExtractor::new(Language::Html, ParserLanguage::Html)),
+            ),
+            (
+                Language::Css,
+                Arc::new(TreeSitterExtractor::new(Language::Css, ParserLanguage::Css)),
+            ),
+            (
+                Language::Yaml,
+                Arc::new(TreeSitterExtractor::new(Language::Yaml, ParserLanguage::Yaml)),
             ),
         ];
 
@@ -72,9 +192,33 @@ impl DefaultExtractorRegistry {
 #[derive(Clone, Copy)]
 enum ParserLanguage {
     JavaScript,
+    TypeScript,
     Python,
     Go,
     Rust,
+    Java,
+    Kotlin,
+    CSharp,
+    C,
+    Cpp,
+    Swift,
+    ObjectiveC,
+    Ruby,
+    Php,
+    Scala,
+    Elixir,
+    Erlang,
+    Dart,
+    Lua,
+    R,
+    Julia,
+    Haskell,
+    Ocaml,
+    Clojure,
+    Bash,
+    Html,
+    Css,
+    Yaml,
 }
 
 impl ParserLanguage {
@@ -82,6 +226,9 @@ impl ParserLanguage {
         match self {
             Self::JavaScript => parser
                 .set_language(&tree_sitter_javascript::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::TypeScript => parser
+                .set_language(&tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into())
                 .map_err(|error| CortexError::Parser(error.to_string())),
             Self::Python => parser
                 .set_language(&tree_sitter_python::LANGUAGE.into())
@@ -91,6 +238,75 @@ impl ParserLanguage {
                 .map_err(|error| CortexError::Parser(error.to_string())),
             Self::Rust => parser
                 .set_language(&tree_sitter_rust::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Java => parser
+                .set_language(&tree_sitter_java::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Kotlin => parser
+                .set_language(&tree_sitter_kotlin_codanna::language())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::CSharp => parser
+                .set_language(&tree_sitter_c_sharp::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::C => parser
+                .set_language(&tree_sitter_c::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Cpp => parser
+                .set_language(&tree_sitter_cpp::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Swift => parser
+                .set_language(&tree_sitter_swift::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::ObjectiveC => parser
+                .set_language(&tree_sitter_objc::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Ruby => parser
+                .set_language(&tree_sitter_ruby::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Php => parser
+                .set_language(&tree_sitter_php::LANGUAGE_PHP.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Scala => parser
+                .set_language(&tree_sitter_scala::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Elixir => parser
+                .set_language(&tree_sitter_elixir::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Erlang => parser
+                .set_language(&tree_sitter_erlang::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Dart => parser
+                .set_language(&tree_sitter_dart::language())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Lua => parser
+                .set_language(&tree_sitter_lua::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::R => parser
+                .set_language(&tree_sitter_r::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Julia => parser
+                .set_language(&tree_sitter_julia::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Haskell => parser
+                .set_language(&tree_sitter_haskell::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Ocaml => parser
+                .set_language(&tree_sitter_ocaml::LANGUAGE_OCAML.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Clojure => parser
+                .set_language(&tree_sitter_clojure::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Bash => parser
+                .set_language(&tree_sitter_bash::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Html => parser
+                .set_language(&tree_sitter_html::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Css => parser
+                .set_language(&tree_sitter_css::LANGUAGE.into())
+                .map_err(|error| CortexError::Parser(error.to_string())),
+            Self::Yaml => parser
+                .set_language(&tree_sitter_yaml::LANGUAGE.into())
                 .map_err(|error| CortexError::Parser(error.to_string())),
         }
     }
@@ -201,7 +417,7 @@ impl<'a> SymbolCollector<'a> {
         source: &str,
     ) -> Option<(ExtractedSymbol, Option<(usize, usize)>)> {
         let (kind, name_node) = match self.language {
-            Language::JavaScript => match node.kind() {
+            Language::JavaScript | Language::TypeScript => match node.kind() {
                 "function_declaration" => (SymbolKind::Function, node.child_by_field_name("name")?),
                 "class_declaration" => (SymbolKind::Class, node.child_by_field_name("name")?),
                 "method_definition" => (SymbolKind::Method, node.child_by_field_name("name")?),
@@ -246,6 +462,53 @@ impl<'a> SymbolCollector<'a> {
                 "mod_item" => (SymbolKind::Module, node.child_by_field_name("name")?),
                 _ => return None,
             },
+            Language::Java
+            | Language::Kotlin
+            | Language::CSharp
+            | Language::C
+            | Language::Cpp
+            | Language::Swift
+            | Language::ObjectiveC
+            | Language::Ruby
+            | Language::Php
+            | Language::Scala
+            | Language::Elixir
+            | Language::Erlang
+            | Language::Dart
+            | Language::Lua
+            | Language::R
+            | Language::Julia
+            | Language::Haskell
+            | Language::Ocaml
+            | Language::Clojure
+            | Language::Bash
+            | Language::Html
+            | Language::Css
+            | Language::Yaml => match node.kind() {
+                "function_declaration" | "function_definition" | "method_declaration" => {
+                    (SymbolKind::Function, node.child_by_field_name("name")?)
+                }
+                "method_definition" => (SymbolKind::Method, node.child_by_field_name("name")?),
+                "class_declaration" | "class_definition" => {
+                    (SymbolKind::Class, node.child_by_field_name("name")?)
+                }
+                "interface_declaration" | "interface_definition" => {
+                    (SymbolKind::Interface, node.child_by_field_name("name")?)
+                }
+                "struct_declaration" | "struct_item" => {
+                    (SymbolKind::Type, node.child_by_field_name("name")?)
+                }
+                "enum_declaration" | "enum_item" => {
+                    (SymbolKind::Type, node.child_by_field_name("name")?)
+                }
+                "type_alias_declaration" | "type_item" => {
+                    (SymbolKind::Type, node.child_by_field_name("name")?)
+                }
+                "const_declaration" | "constant_declaration" => {
+                    (SymbolKind::Constant, node.child_by_field_name("name")?)
+                }
+                _ => return None,
+            },
         };
 
         let name = node_text(name_node, source)?;
@@ -285,7 +548,7 @@ impl<'a> SymbolCollector<'a> {
 
     fn extract_import(&mut self, node: Node<'_>, source: &str) -> bool {
         let module_name = match self.language {
-            Language::JavaScript => match node.kind() {
+            Language::JavaScript | Language::TypeScript => match node.kind() {
                 "import_statement" => last_string_literal(node, source),
                 _ => None,
             },
@@ -299,6 +562,34 @@ impl<'a> SymbolCollector<'a> {
             },
             Language::Rust => match node.kind() {
                 "use_declaration" => first_identifier_like(node, source),
+                _ => None,
+            },
+            Language::Java
+            | Language::Kotlin
+            | Language::CSharp
+            | Language::C
+            | Language::Cpp
+            | Language::Swift
+            | Language::ObjectiveC
+            | Language::Ruby
+            | Language::Php
+            | Language::Scala
+            | Language::Elixir
+            | Language::Erlang
+            | Language::Dart
+            | Language::Lua
+            | Language::R
+            | Language::Julia
+            | Language::Haskell
+            | Language::Ocaml
+            | Language::Clojure
+            | Language::Bash
+            | Language::Html
+            | Language::Css
+            | Language::Yaml => match node.kind() {
+                "import_declaration" | "using_declaration" | "import_from" | "include" => {
+                    last_identifier_like(node, source)
+                }
                 _ => None,
             },
         };
@@ -319,8 +610,10 @@ impl<'a> SymbolCollector<'a> {
 
     fn extract_call(&mut self, node: Node<'_>, source: &str) -> bool {
         let target_name = match node.kind() {
-            "call_expression" => node
+            "call_expression" | "call" | "function_call" | "invocation_expression" => node
                 .child_by_field_name("function")
+                .or_else(|| node.child_by_field_name("callee"))
+                .or_else(|| node.child_by_field_name("name"))
                 .and_then(|function| last_identifier_in_subtree(function, source)),
             _ => None,
         };
@@ -346,7 +639,13 @@ impl<'a> SymbolCollector<'a> {
 
         let is_identifier = matches!(
             node.kind(),
-            "identifier" | "type_identifier" | "field_identifier" | "property_identifier"
+            "identifier"
+                | "type_identifier"
+                | "field_identifier"
+                | "property_identifier"
+                | "variable_identifier"
+                | "constant_identifier"
+                | "scoped_identifier"
         );
         if !is_identifier {
             return false;
@@ -369,6 +668,13 @@ impl<'a> SymbolCollector<'a> {
                     | "type_item"
                     | "const_item"
                     | "import_spec"
+                    | "interface_declaration"
+                    | "interface_definition"
+                    | "type_alias_declaration"
+                    | "struct_declaration"
+                    | "enum_declaration"
+                    | "const_declaration"
+                    | "constant_declaration"
             )
         ) {
             return false;
@@ -438,7 +744,12 @@ fn parent_keyword_is_const(node: Node<'_>, source: &str) -> bool {
 fn last_string_literal(node: Node<'_>, source: &str) -> Option<String> {
     let mut cursor = node.walk();
     node.children(&mut cursor)
-        .filter(|child| matches!(child.kind(), "string" | "interpreted_string_literal"))
+        .filter(|child| {
+            matches!(
+                child.kind(),
+                "string" | "interpreted_string_literal" | "string_literal"
+            )
+        })
         .filter_map(|child| node_text(child, source))
         .last()
 }
@@ -469,6 +780,8 @@ fn last_identifier_like(node: Node<'_>, source: &str) -> Option<String> {
                     | "aliased_import"
                     | "namespace_import"
                     | "scoped_identifier"
+                    | "variable_identifier"
+                    | "constant_identifier"
             ) {
                 node_text(child, source)
             } else {
@@ -484,7 +797,13 @@ fn last_identifier_in_subtree(node: Node<'_>, source: &str) -> Option<String> {
         .filter_map(|child| {
             if matches!(
                 child.kind(),
-                "identifier" | "type_identifier" | "field_identifier" | "property_identifier"
+                "identifier"
+                    | "type_identifier"
+                    | "field_identifier"
+                    | "property_identifier"
+                    | "scoped_identifier"
+                    | "variable_identifier"
+                    | "constant_identifier"
             ) {
                 node_text(child, source)
             } else {
@@ -495,7 +814,13 @@ fn last_identifier_in_subtree(node: Node<'_>, source: &str) -> Option<String> {
         .or_else(|| {
             if matches!(
                 node.kind(),
-                "identifier" | "type_identifier" | "field_identifier" | "property_identifier"
+                "identifier"
+                    | "type_identifier"
+                    | "field_identifier"
+                    | "property_identifier"
+                    | "scoped_identifier"
+                    | "variable_identifier"
+                    | "constant_identifier"
             ) {
                 node_text(node, source)
             } else {

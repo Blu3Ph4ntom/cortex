@@ -3,8 +3,9 @@ use clap::{Parser, Subcommand};
 use cortex_core::indexer::{Indexer, RepositorySession, RepositorySessionConfig};
 use cortex_core::model::{DependencyDirection, QueryFilter, SymbolKind};
 use notify::{Event, RecursiveMode, Watcher, recommended_watcher};
+use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
-use std::sync::mpsc::channel;
+use std::sync::mpsc::sync_channel;
 use std::time::Duration;
 
 #[derive(Parser, Debug)]
@@ -193,31 +194,86 @@ fn run_watch(repo: &Path, store_path: Option<&Path>) -> Result<()> {
     let indexer = Indexer::new(session);
     indexer.build_full()?;
 
-    let (tx, rx) = channel::<notify::Result<Event>>();
+    let (tx, rx) = sync_channel::<notify::Result<Event>>(256);
     let mut watcher = recommended_watcher(move |event| {
         let _ = tx.send(event);
     })?;
     watcher.watch(repo, RecursiveMode::Recursive)?;
 
+    let mut pending_paths = BTreeSet::new();
     loop {
-        match rx.recv_timeout(Duration::from_secs(1)) {
-            Ok(Ok(event)) => {
-                let paths = event
-                    .paths
-                    .into_iter()
-                    .filter(|path| path.is_file() || !path.exists())
-                    .collect::<Vec<_>>();
-                if paths.is_empty() {
-                    continue;
-                }
-
-                let stats = indexer.refresh_paths(&paths)?;
-                print_json(stats)?;
+        match rx.recv() {
+            Ok(Ok(event)) => collect_watch_paths(&mut pending_paths, event),
+            Ok(Err(error)) => {
+                eprintln!("watch error: {error}");
+                continue;
             }
-            Ok(Err(error)) => eprintln!("watch error: {error}"),
-            Err(_) => {}
+            Err(_) => return Ok(()),
+        }
+
+        loop {
+            match rx.recv_timeout(Duration::from_millis(200)) {
+                Ok(Ok(event)) => collect_watch_paths(&mut pending_paths, event),
+                Ok(Err(error)) => eprintln!("watch error: {error}"),
+                Err(_) => break,
+            }
+        }
+
+        if pending_paths.is_empty() {
+            continue;
+        }
+
+        let paths = pending_paths.iter().cloned().collect::<Vec<_>>();
+        pending_paths.clear();
+        let stats = indexer.refresh_paths(&paths)?;
+        print_json(stats)?;
+    }
+}
+
+fn collect_watch_paths(pending: &mut BTreeSet<PathBuf>, event: Event) {
+    for path in event.paths {
+        if should_watch_path(&path) {
+            pending.insert(path);
         }
     }
+}
+
+fn should_watch_path(path: &Path) -> bool {
+    if is_ignored_path(path) {
+        return false;
+    }
+
+    if !path.exists() {
+        return true;
+    }
+
+    if path.is_file() {
+        return cortex_core::model::Language::from_path(path).is_some();
+    }
+
+    false
+}
+
+fn is_ignored_path(path: &Path) -> bool {
+    path.components().any(|component| {
+        let name = component.as_os_str().to_string_lossy();
+        matches!(
+            name.as_ref(),
+            ".git"
+                | ".hg"
+                | ".svn"
+                | ".idea"
+                | ".vscode"
+                | "node_modules"
+                | "dist"
+                | "build"
+                | "target"
+                | ".cortex"
+                | "__pycache__"
+                | ".venv"
+                | "venv"
+        )
+    })
 }
 
 fn open_session(repo: &Path, store_path: Option<&Path>) -> Result<RepositorySession> {

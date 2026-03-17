@@ -5,19 +5,68 @@ use std::path::{Path, PathBuf};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub enum Language {
     JavaScript,
+    TypeScript,
     Python,
     Go,
     Rust,
+    Java,
+    Kotlin,
+    CSharp,
+    C,
+    Cpp,
+    Swift,
+    ObjectiveC,
+    Ruby,
+    Php,
+    Scala,
+    Elixir,
+    Erlang,
+    Dart,
+    Lua,
+    R,
+    Julia,
+    Haskell,
+    Ocaml,
+    Clojure,
+    Bash,
+    Html,
+    Css,
+    Yaml,
 }
 
 impl Language {
     pub fn from_path(path: &Path) -> Option<Self> {
-        let ext = path.extension()?.to_str()?;
-        match ext {
-            "js" | "jsx" | "ts" | "tsx" | "mjs" | "cjs" => Some(Self::JavaScript),
+        let ext = path.extension()?.to_str()?.to_ascii_lowercase();
+        match ext.as_str() {
+            "js" | "jsx" | "mjs" | "cjs" => Some(Self::JavaScript),
+            "ts" | "tsx" => Some(Self::TypeScript),
             "py" => Some(Self::Python),
             "go" => Some(Self::Go),
             "rs" => Some(Self::Rust),
+            "java" => Some(Self::Java),
+            "kt" | "kts" => Some(Self::Kotlin),
+            "cs" => Some(Self::CSharp),
+            "c" => Some(Self::C),
+            "h" => Some(Self::C),
+            "cpp" | "cc" | "cxx" | "hpp" | "hh" => Some(Self::Cpp),
+            "swift" => Some(Self::Swift),
+            "m" | "mm" => Some(Self::ObjectiveC),
+            "rb" => Some(Self::Ruby),
+            "php" => Some(Self::Php),
+            "scala" => Some(Self::Scala),
+            "ex" | "exs" => Some(Self::Elixir),
+            "erl" | "hrl" => Some(Self::Erlang),
+            "dart" => Some(Self::Dart),
+            "lua" => Some(Self::Lua),
+            "r" => Some(Self::R),
+            "jl" => Some(Self::Julia),
+            "hs" => Some(Self::Haskell),
+            "ml" | "mli" => Some(Self::Ocaml),
+            "clj" | "cljs" | "cljc" => Some(Self::Clojure),
+            "sh" | "bash" => Some(Self::Bash),
+            "html" | "htm" => Some(Self::Html),
+            "css" => Some(Self::Css),
+            "yml" | "yaml" => Some(Self::Yaml),
             _ => None,
         }
     }
@@ -25,9 +74,33 @@ impl Language {
     pub fn as_str(self) -> &'static str {
         match self {
             Self::JavaScript => "javascript",
+            Self::TypeScript => "typescript",
             Self::Python => "python",
             Self::Go => "go",
             Self::Rust => "rust",
+            Self::Java => "java",
+            Self::Kotlin => "kotlin",
+            Self::CSharp => "csharp",
+            Self::C => "c",
+            Self::Cpp => "cpp",
+            Self::Swift => "swift",
+            Self::ObjectiveC => "objective-c",
+            Self::Ruby => "ruby",
+            Self::Php => "php",
+            Self::Scala => "scala",
+            Self::Elixir => "elixir",
+            Self::Erlang => "erlang",
+            Self::Dart => "dart",
+            Self::Lua => "lua",
+            Self::R => "r",
+            Self::Julia => "julia",
+            Self::Haskell => "haskell",
+            Self::Ocaml => "ocaml",
+            Self::Clojure => "clojure",
+            Self::Bash => "bash",
+            Self::Html => "html",
+            Self::Css => "css",
+            Self::Yaml => "yaml",
         }
     }
 }
@@ -172,7 +245,7 @@ pub struct IndexStats {
     pub file_count: usize,
     pub symbol_count: usize,
     pub edge_count: usize,
-    /// Bytes reclaimed during auto-compaction (if any).
+    /// Bytes reclaimed during store replacement (if any).
     pub bytes_reclaimed: Option<u64>,
 }
 

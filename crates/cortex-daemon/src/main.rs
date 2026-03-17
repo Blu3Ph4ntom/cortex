@@ -9,10 +9,11 @@ use axum::{
 use clap::Parser;
 use cortex_core::indexer::{Indexer, RepositorySession, RepositorySessionConfig};
 use cortex_core::model::{DependencyDirection, QueryFilter, SymbolKind};
+use cortex_core::query::QueryEngine;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, RwLock};
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -27,6 +28,7 @@ struct Args {
 #[derive(Clone)]
 struct AppState {
     session: Arc<Mutex<RepositorySession>>,
+    query_cache: Arc<RwLock<Option<Arc<QueryEngine>>>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -77,6 +79,7 @@ async fn main() -> Result<()> {
     if indexer.health()?.indexed_files == 0 {
         indexer.build_full()?;
     }
+    let query_cache = Arc::new(RwLock::new(Some(Arc::new(session.query_engine()?))));
 
     let app = Router::new()
         .route("/index/open", post(open_index))
@@ -90,6 +93,7 @@ async fn main() -> Result<()> {
         .route("/graph/explain", get(explain))
         .with_state(AppState {
             session: Arc::new(Mutex::new(session)),
+            query_cache,
         });
 
     let listener = tokio::net::TcpListener::bind(args.bind).await?;
@@ -104,11 +108,14 @@ async fn open_index(State(state): State<AppState>, Json(request): Json<OpenReque
     };
     match RepositorySession::open(config) {
         Ok(session) => {
-            if let Ok(mut guard) = state.session.lock() {
+            let indexer = Indexer::new(session.clone());
+            let result = indexer.build_full().and_then(|stats| {
+                let mut guard = state.session.lock().expect("session mutex poisoned");
                 *guard = session.clone();
-            }
-            let indexer = Indexer::new(session);
-            response(indexer.build_full())
+                refresh_query_cache(&state, &session)?;
+                Ok(stats)
+            });
+            response(result)
         }
         Err(error) => error_response(error),
     }
@@ -119,20 +126,23 @@ async fn refresh_index(
     Json(request): Json<RefreshRequest>,
 ) -> impl IntoResponse {
     let session = clone_session(&state);
-    let indexer = Indexer::new(session);
+    let indexer = Indexer::new(session.clone());
     let paths = request
         .paths
         .unwrap_or_else(|| vec![indexer.session().repo_path().to_path_buf()]);
-    response(indexer.refresh_paths(&paths))
+    let result = indexer.refresh_paths(&paths).and_then(|stats| {
+        refresh_query_cache(&state, &session)?;
+        Ok(stats)
+    });
+    response(result)
 }
 
 async fn find_symbol(
     State(state): State<AppState>,
     Query(query): Query<FindSymbolQuery>,
 ) -> impl IntoResponse {
-    let session = clone_session(&state);
     let kind = query.kind.as_deref().and_then(SymbolKind::parse);
-    response(session.query_engine().and_then(|engine| {
+    response(cached_query_engine(&state).and_then(|engine| {
         engine.find_symbol(QueryFilter {
             name: query.name,
             fq_name: query.fq_name,
@@ -148,16 +158,14 @@ async fn dependencies(
     State(state): State<AppState>,
     Query(query): Query<DependencyQuery>,
 ) -> impl IntoResponse {
-    let session = clone_session(&state);
     let direction = match query.direction.as_deref() {
         Some("inbound") => DependencyDirection::Inbound,
         Some("both") => DependencyDirection::Both,
         _ => DependencyDirection::Outbound,
     };
     response(
-        session.query_engine().and_then(|engine| {
-            engine.dependencies(&query.target, direction, query.depth.unwrap_or(2))
-        }),
+        cached_query_engine(&state)
+            .and_then(|engine| engine.dependencies(&query.target, direction, query.depth.unwrap_or(2))),
     )
 }
 
@@ -165,12 +173,9 @@ async fn callers(
     State(state): State<AppState>,
     Query(query): Query<TargetQuery>,
 ) -> impl IntoResponse {
-    let session = clone_session(&state);
     let target = query.symbol.or(query.path).unwrap_or_default();
     response(
-        session
-            .query_engine()
-            .and_then(|engine| engine.callers(&target)),
+        cached_query_engine(&state).and_then(|engine| engine.callers(&target)),
     )
 }
 
@@ -178,12 +183,9 @@ async fn callees(
     State(state): State<AppState>,
     Query(query): Query<TargetQuery>,
 ) -> impl IntoResponse {
-    let session = clone_session(&state);
     let target = query.symbol.or(query.path).unwrap_or_default();
     response(
-        session
-            .query_engine()
-            .and_then(|engine| engine.callees(&target)),
+        cached_query_engine(&state).and_then(|engine| engine.callees(&target)),
     )
 }
 
@@ -191,12 +193,9 @@ async fn references(
     State(state): State<AppState>,
     Query(query): Query<TargetQuery>,
 ) -> impl IntoResponse {
-    let session = clone_session(&state);
     let target = query.symbol.or(query.path).unwrap_or_default();
     response(
-        session
-            .query_engine()
-            .and_then(|engine| engine.references(&target)),
+        cached_query_engine(&state).and_then(|engine| engine.references(&target)),
     )
 }
 
@@ -204,10 +203,8 @@ async fn impact(
     State(state): State<AppState>,
     Query(query): Query<DependencyQuery>,
 ) -> impl IntoResponse {
-    let session = clone_session(&state);
     response(
-        session
-            .query_engine()
+        cached_query_engine(&state)
             .and_then(|engine| engine.impact(&query.target, query.depth.unwrap_or(3))),
     )
 }
@@ -216,12 +213,9 @@ async fn explain(
     State(state): State<AppState>,
     Query(query): Query<TargetQuery>,
 ) -> impl IntoResponse {
-    let session = clone_session(&state);
     let target = query.symbol.or(query.path).unwrap_or_default();
     response(
-        session
-            .query_engine()
-            .and_then(|engine| engine.explain(&target)),
+        cached_query_engine(&state).and_then(|engine| engine.explain(&target)),
     )
 }
 
@@ -231,6 +225,32 @@ fn clone_session(state: &AppState) -> RepositorySession {
         .lock()
         .expect("session mutex poisoned")
         .clone()
+}
+
+fn cached_query_engine(
+    state: &AppState,
+) -> Result<Arc<QueryEngine>, cortex_core::storage::CortexError> {
+    {
+        let guard = state.query_cache.read().expect("query cache lock poisoned");
+        if let Some(engine) = guard.as_ref() {
+            return Ok(Arc::clone(engine));
+        }
+    }
+    let session = clone_session(state);
+    let engine = Arc::new(session.query_engine()?);
+    let mut guard = state.query_cache.write().expect("query cache lock poisoned");
+    *guard = Some(Arc::clone(&engine));
+    Ok(engine)
+}
+
+fn refresh_query_cache(
+    state: &AppState,
+    session: &RepositorySession,
+) -> Result<(), cortex_core::storage::CortexError> {
+    let engine = Arc::new(session.query_engine()?);
+    let mut guard = state.query_cache.write().expect("query cache lock poisoned");
+    *guard = Some(engine);
+    Ok(())
 }
 
 fn response<T>(value: Result<T, cortex_core::storage::CortexError>) -> Response

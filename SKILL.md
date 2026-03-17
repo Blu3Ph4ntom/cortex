@@ -23,6 +23,18 @@ Use this skill when Cortex is available in the working environment and you need 
 cortex index --repo /path/to/repo
 ```
 
+If the repo changes after indexing, refresh the graph before answering:
+
+```bash
+cortex index --repo /path/to/repo
+```
+
+If using the daemon, refresh over HTTP:
+
+```bash
+curl -X POST "http://127.0.0.1:8787/index/refresh"
+```
+
 2. Resolve the target symbol:
 
 ```bash

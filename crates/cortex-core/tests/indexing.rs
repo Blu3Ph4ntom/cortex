@@ -122,3 +122,54 @@ fn root() {
     assert!(inbound.nodes.iter().any(|node| node.name == "root"));
     Ok(())
 }
+
+#[test]
+fn rebuild_should_replace_store_directory() -> Result<()> {
+    let temp = tempdir()?;
+    let repo = temp.path();
+    fs::write(
+        repo.join("lib.rs"),
+        r#"
+fn alpha() {}
+"#,
+    )?;
+
+    let session = RepositorySession::open(RepositorySessionConfig::new(repo))?;
+    let indexer = Indexer::new(session.clone());
+    indexer.build_full()?;
+
+    let store_root = repo.join(".cortex").join("index");
+    let parent = store_root
+        .parent()
+        .expect("store root should have a parent directory");
+    let entries_before = fs::read_dir(&store_root)?.count();
+
+    fs::write(
+        repo.join("lib.rs"),
+        r#"
+fn alpha() {}
+fn beta() {}
+"#,
+    )?;
+
+    indexer.build_full()?;
+
+    let entries_after = fs::read_dir(&store_root)?.count();
+    assert!(entries_before > 0);
+    assert!(entries_after > 0);
+
+    let mut has_prev = false;
+    let mut has_next = false;
+    for entry in fs::read_dir(parent)? {
+        let name = entry?.file_name();
+        if name.to_string_lossy() == "index.prev" {
+            has_prev = true;
+        }
+        if name.to_string_lossy() == "index.next" {
+            has_next = true;
+        }
+    }
+    assert!(!has_prev);
+    assert!(!has_next);
+    Ok(())
+}
