@@ -20,37 +20,38 @@ pub struct DefaultExtractorRegistry {
 
 impl Default for DefaultExtractorRegistry {
     fn default() -> Self {
-        let extractors: [(Language, Arc<dyn SemanticExtractor>); 4] = [
-            (
-                Language::JavaScript,
-                Arc::new(TreeSitterExtractor::new(
-                    Language::JavaScript,
-                    ParserLanguage::JavaScript,
-                )),
-            ),
-            (
-                Language::Python,
-                Arc::new(TreeSitterExtractor::new(
-                    Language::Python,
-                    ParserLanguage::Python,
-                )),
-            ),
-            (
-                Language::Go,
-                Arc::new(TreeSitterExtractor::new(Language::Go, ParserLanguage::Go)),
-            ),
-            (
-                Language::Rust,
-                Arc::new(TreeSitterExtractor::new(
-                    Language::Rust,
-                    ParserLanguage::Rust,
-                )),
-            ),
-        ];
+        let ts: Arc<dyn SemanticExtractor> = Arc::new(TreeSitterExtractor::new(
+            Language::JavaScript,
+            ParserLanguage::JavaScript,
+        ));
+        let py: Arc<dyn SemanticExtractor> =
+            Arc::new(TreeSitterExtractor::new(Language::Python, ParserLanguage::Python));
+        let go: Arc<dyn SemanticExtractor> =
+            Arc::new(TreeSitterExtractor::new(Language::Go, ParserLanguage::Go));
+        let rs: Arc<dyn SemanticExtractor> =
+            Arc::new(TreeSitterExtractor::new(Language::Rust, ParserLanguage::Rust));
 
-        Self {
-            extractors: extractors.into_iter().collect(),
+        let fallback_languages = [
+            Language::Java,
+            Language::CSharp,
+            Language::Ruby,
+            Language::Php,
+            Language::C,
+            Language::Cpp,
+        ];
+        let mut extractors: BTreeMap<Language, Arc<dyn SemanticExtractor>> = [
+            (Language::JavaScript, ts),
+            (Language::Python, py),
+            (Language::Go, go),
+            (Language::Rust, rs),
+        ]
+        .into_iter()
+        .collect();
+        for lang in fallback_languages {
+            extractors.insert(lang, Arc::new(FallbackExtractor::new(lang)));
         }
+
+        Self { extractors }
     }
 }
 
@@ -127,6 +128,198 @@ impl SemanticExtractor for TreeSitterExtractor {
         collector.walk(tree.root_node(), source);
         Ok(collector.finish())
     }
+}
+
+/// Heuristic extractor for languages without a tree-sitter grammar in this build.
+/// It performs line-based pattern matching to surface classes, functions, and
+/// other top-level declarations with reasonable (not perfect) accuracy.
+#[derive(Clone)]
+pub struct FallbackExtractor {
+    language: Language,
+}
+
+impl FallbackExtractor {
+    pub fn new(language: Language) -> Self {
+        Self { language }
+    }
+}
+
+impl SemanticExtractor for FallbackExtractor {
+    fn language(&self) -> Language {
+        self.language
+    }
+
+    fn extract(&self, path: &Path, source: &str) -> Result<SemanticDocument, CortexError> {
+        let mut symbols = Vec::new();
+        for (idx, raw_line) in source.lines().enumerate() {
+            let line_number = idx + 1;
+            if let Some(symbol) = heuristic_symbol(raw_line.trim(), line_number) {
+                symbols.push(symbol);
+            }
+        }
+        Ok(SemanticDocument {
+            language: self.language,
+            path: path.to_path_buf(),
+            symbols,
+            relations: Vec::new(),
+        })
+    }
+}
+
+/// Strip common visibility / storage-class prefixes so that the type or
+/// function keyword becomes the first token of the returned slice.
+fn strip_modifiers(mut line: &str) -> &str {
+    const MODIFIERS: &[&str] = &[
+        "public ",
+        "private ",
+        "protected ",
+        "internal ",
+        "static ",
+        "abstract ",
+        "final ",
+        "sealed ",
+        "override ",
+        "virtual ",
+        "async ",
+        "unsafe ",
+        "extern ",
+        "inline ",
+        "const ",
+        "volatile ",
+        "readonly ",
+        "partial ",
+    ];
+    let mut changed = true;
+    while changed {
+        changed = false;
+        for &m in MODIFIERS {
+            if let Some(rest) = line.strip_prefix(m) {
+                line = rest.trim_start();
+                changed = true;
+            }
+        }
+    }
+    line
+}
+
+/// Keywords that introduce a named type-level declaration.
+const TYPE_KEYWORDS: &[(&str, SymbolKind)] = &[
+    ("class ", SymbolKind::Class),
+    ("interface ", SymbolKind::Interface),
+    ("struct ", SymbolKind::Type),
+    ("enum ", SymbolKind::Type),
+    ("trait ", SymbolKind::Trait),
+    ("module ", SymbolKind::Module),
+    ("namespace ", SymbolKind::Module),
+];
+
+/// Control-flow and other keywords that should never be treated as callable names.
+const CONTROL_FLOW: &[&str] = &[
+    "if", "else", "for", "while", "do", "switch", "case", "catch", "try", "throw", "return",
+    "new", "delete", "using", "lock", "foreach", "with", "match", "when", "except", "raise",
+    "yield", "await", "async", "import", "include", "require", "print", "println", "printf",
+    "scanf", "assert",
+];
+
+fn identifier_from_start(s: &str) -> Option<String> {
+    let mut chars = s.chars().peekable();
+    // Identifiers must not start with a digit.
+    if !chars.peek().is_some_and(|c| c.is_alphabetic() || *c == '_') {
+        return None;
+    }
+    let name: String = chars
+        .take_while(|c| c.is_alphanumeric() || *c == '_')
+        .collect();
+    if name.is_empty() { None } else { Some(name) }
+}
+
+/// Make a best-effort symbol with a simple local id (no parent tracking).
+fn make_fallback_symbol(name: String, kind: SymbolKind, line_number: usize) -> ExtractedSymbol {
+    let local_id = format!("{}:{}:{}", kind_label(kind), name, line_number);
+    ExtractedSymbol {
+        fq_name: Some(name.clone()),
+        local_id,
+        name,
+        kind,
+        span: Span {
+            start_line: line_number,
+            start_column: 1,
+            end_line: line_number,
+            end_column: 1,
+        },
+        parent_local_id: None,
+    }
+}
+
+fn heuristic_symbol(line: &str, line_number: usize) -> Option<ExtractedSymbol> {
+    // Skip blank lines, comment lines, and preprocessor directives.
+    if line.is_empty()
+        || line.starts_with("//")
+        || line.starts_with("/*")
+        || line.starts_with('*')
+        || line.starts_with('#')
+        || line.starts_with("<!--")
+    {
+        return None;
+    }
+
+    let stripped = strip_modifiers(line);
+
+    // Type-level declarations (class, interface, struct, enum, …)
+    for &(keyword, kind) in TYPE_KEYWORDS {
+        if let Some(rest) = stripped.strip_prefix(keyword)
+            && let Some(name) = identifier_from_start(rest.trim_start())
+        {
+            return Some(make_fallback_symbol(name, kind, line_number));
+        }
+    }
+
+    // Ruby / Python-style `def name` or `def self.name`
+    if let Some(rest) = stripped.strip_prefix("def ") {
+        let rest = rest
+            .trim_start()
+            .trim_start_matches("self.")
+            .trim_start_matches("self::");
+        if let Some(name) = identifier_from_start(rest) {
+            return Some(make_fallback_symbol(name, SymbolKind::Method, line_number));
+        }
+    }
+
+    // PHP / JavaScript `function name(`
+    if let Some(rest) = stripped.strip_prefix("function ")
+        && let Some(name) = identifier_from_start(rest.trim_start())
+    {
+        return Some(make_fallback_symbol(name, SymbolKind::Function, line_number));
+    }
+
+    // C / C++ / Java / C# style: `ReturnType name(…`
+    // Heuristic: find the identifier immediately before the first `(`.
+    if let Some(paren_pos) = stripped.find('(') {
+        let before = stripped[..paren_pos].trim_end();
+        // Find the start of the last word in `before`.
+        let word_end = before.len();
+        let word_start = before
+            .rfind(|c: char| !c.is_alphanumeric() && c != '_')
+            .map(|i| i + 1)
+            .unwrap_or(0);
+        let name = &before[word_start..word_end];
+        if !name.is_empty()
+            && !CONTROL_FLOW.contains(&name)
+            && name.chars().next().is_some_and(|c| c.is_alphabetic() || c == '_')
+        {
+            // Only emit if there is a space somewhere before `(` (i.e. a
+            // return type precedes the name) or the whole line is just `name(`.
+            if before.contains(' ') || before == name {
+                return Some(make_fallback_symbol(
+                    name.to_owned(),
+                    SymbolKind::Function,
+                    line_number,
+                ));
+            }
+        }
+    }
+
+    None
 }
 
 struct SymbolCollector<'a> {
@@ -246,6 +439,7 @@ impl<'a> SymbolCollector<'a> {
                 "mod_item" => (SymbolKind::Module, node.child_by_field_name("name")?),
                 _ => return None,
             },
+            _ => return None,
         };
 
         let name = node_text(name_node, source)?;
@@ -301,6 +495,7 @@ impl<'a> SymbolCollector<'a> {
                 "use_declaration" => first_identifier_like(node, source),
                 _ => None,
             },
+            _ => None,
         };
 
         let Some(target_name) = module_name else {

@@ -37,12 +37,12 @@ Cortex is useful when an agent or developer needs:
 
 The current benchmark artifact was generated with the release binary on this machine using [`scripts/benchmark.ps1`](./scripts/benchmark.ps1). It compares Cortex against a raw text-search baseline: `git grep -n -w`.
 
-Check [`benchmarks/latest.md`](benchmarks/latest.md) for detailed statistics across all supported languages (including Rust, Python, JavaScript/TypeScript, Go, Java, Ruby, PHP, and C++). The benchmark measures structural query execution vs standard file text search using `git grep`.
+Check [`benchmarks/latest.md`](benchmarks/latest.md) for detailed statistics across all supported languages (including Rust, JavaScript/TypeScript, Python, Go, Java, C#, Ruby, PHP, C, and C++). The benchmark measures structural query execution vs standard file text search using `git grep`.
 
 Headline result:
 
 - Cortex can radically reduce the structural search-space for queries like "what implements/defines X" and "who calls Y".
-- In many cases, Cortex drops hundreds of raw grep lines across dozens of files down to exactly the single relevant node or edge, increasing coding agent success rates.
+- Often, Cortex drops hundreds of raw grep lines across dozens of files down to exactly the single relevant node or edge, increasing coding agent success rates.
 
 This is the right way to read the benchmark: Cortex is not trying to beat grep on “find bytes in files.” It is trying to reduce the amount of irrelevant text an agent has to inspect to answer a structural question.
 

@@ -4,9 +4,15 @@ use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub enum Language {
-    JavaScript,
-    Python,
+    C,
+    Cpp,
+    CSharp,
     Go,
+    Java,
+    JavaScript,
+    Php,
+    Python,
+    Ruby,
     Rust,
 }
 
@@ -18,6 +24,12 @@ impl Language {
             "py" => Some(Self::Python),
             "go" => Some(Self::Go),
             "rs" => Some(Self::Rust),
+            "java" => Some(Self::Java),
+            "cs" => Some(Self::CSharp),
+            "rb" => Some(Self::Ruby),
+            "php" => Some(Self::Php),
+            "c" | "h" => Some(Self::C),
+            "cpp" | "cc" | "cxx" | "hpp" | "hxx" => Some(Self::Cpp),
             _ => None,
         }
     }
@@ -28,6 +40,12 @@ impl Language {
             Self::Python => "python",
             Self::Go => "go",
             Self::Rust => "rust",
+            Self::Java => "java",
+            Self::CSharp => "csharp",
+            Self::Ruby => "ruby",
+            Self::Php => "php",
+            Self::C => "c",
+            Self::Cpp => "cpp",
         }
     }
 }
