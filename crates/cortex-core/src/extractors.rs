@@ -55,7 +55,10 @@ impl Default for DefaultExtractorRegistry {
             ),
             (
                 Language::Java,
-                Arc::new(TreeSitterExtractor::new(Language::Java, ParserLanguage::Java)),
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Java,
+                    ParserLanguage::Java,
+                )),
             ),
             (
                 Language::Kotlin,
@@ -81,7 +84,10 @@ impl Default for DefaultExtractorRegistry {
             ),
             (
                 Language::Swift,
-                Arc::new(TreeSitterExtractor::new(Language::Swift, ParserLanguage::Swift)),
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Swift,
+                    ParserLanguage::Swift,
+                )),
             ),
             (
                 Language::ObjectiveC,
@@ -92,7 +98,10 @@ impl Default for DefaultExtractorRegistry {
             ),
             (
                 Language::Ruby,
-                Arc::new(TreeSitterExtractor::new(Language::Ruby, ParserLanguage::Ruby)),
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Ruby,
+                    ParserLanguage::Ruby,
+                )),
             ),
             (
                 Language::Php,
@@ -100,7 +109,10 @@ impl Default for DefaultExtractorRegistry {
             ),
             (
                 Language::Scala,
-                Arc::new(TreeSitterExtractor::new(Language::Scala, ParserLanguage::Scala)),
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Scala,
+                    ParserLanguage::Scala,
+                )),
             ),
             (
                 Language::Elixir,
@@ -118,7 +130,10 @@ impl Default for DefaultExtractorRegistry {
             ),
             (
                 Language::Dart,
-                Arc::new(TreeSitterExtractor::new(Language::Dart, ParserLanguage::Dart)),
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Dart,
+                    ParserLanguage::Dart,
+                )),
             ),
             (
                 Language::Lua,
@@ -130,7 +145,10 @@ impl Default for DefaultExtractorRegistry {
             ),
             (
                 Language::Julia,
-                Arc::new(TreeSitterExtractor::new(Language::Julia, ParserLanguage::Julia)),
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Julia,
+                    ParserLanguage::Julia,
+                )),
             ),
             (
                 Language::Haskell,
@@ -141,7 +159,10 @@ impl Default for DefaultExtractorRegistry {
             ),
             (
                 Language::Ocaml,
-                Arc::new(TreeSitterExtractor::new(Language::Ocaml, ParserLanguage::Ocaml)),
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Ocaml,
+                    ParserLanguage::Ocaml,
+                )),
             ),
             (
                 Language::Clojure,
@@ -152,11 +173,17 @@ impl Default for DefaultExtractorRegistry {
             ),
             (
                 Language::Bash,
-                Arc::new(TreeSitterExtractor::new(Language::Bash, ParserLanguage::Bash)),
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Bash,
+                    ParserLanguage::Bash,
+                )),
             ),
             (
                 Language::Html,
-                Arc::new(TreeSitterExtractor::new(Language::Html, ParserLanguage::Html)),
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Html,
+                    ParserLanguage::Html,
+                )),
             ),
             (
                 Language::Css,
@@ -164,7 +191,10 @@ impl Default for DefaultExtractorRegistry {
             ),
             (
                 Language::Yaml,
-                Arc::new(TreeSitterExtractor::new(Language::Yaml, ParserLanguage::Yaml)),
+                Arc::new(TreeSitterExtractor::new(
+                    Language::Yaml,
+                    ParserLanguage::Yaml,
+                )),
             ),
         ];
 

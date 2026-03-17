@@ -164,8 +164,9 @@ async fn dependencies(
         _ => DependencyDirection::Outbound,
     };
     response(
-        cached_query_engine(&state)
-            .and_then(|engine| engine.dependencies(&query.target, direction, query.depth.unwrap_or(2))),
+        cached_query_engine(&state).and_then(|engine| {
+            engine.dependencies(&query.target, direction, query.depth.unwrap_or(2))
+        }),
     )
 }
 
@@ -174,9 +175,7 @@ async fn callers(
     Query(query): Query<TargetQuery>,
 ) -> impl IntoResponse {
     let target = query.symbol.or(query.path).unwrap_or_default();
-    response(
-        cached_query_engine(&state).and_then(|engine| engine.callers(&target)),
-    )
+    response(cached_query_engine(&state).and_then(|engine| engine.callers(&target)))
 }
 
 async fn callees(
@@ -184,9 +183,7 @@ async fn callees(
     Query(query): Query<TargetQuery>,
 ) -> impl IntoResponse {
     let target = query.symbol.or(query.path).unwrap_or_default();
-    response(
-        cached_query_engine(&state).and_then(|engine| engine.callees(&target)),
-    )
+    response(cached_query_engine(&state).and_then(|engine| engine.callees(&target)))
 }
 
 async fn references(
@@ -194,9 +191,7 @@ async fn references(
     Query(query): Query<TargetQuery>,
 ) -> impl IntoResponse {
     let target = query.symbol.or(query.path).unwrap_or_default();
-    response(
-        cached_query_engine(&state).and_then(|engine| engine.references(&target)),
-    )
+    response(cached_query_engine(&state).and_then(|engine| engine.references(&target)))
 }
 
 async fn impact(
@@ -214,9 +209,7 @@ async fn explain(
     Query(query): Query<TargetQuery>,
 ) -> impl IntoResponse {
     let target = query.symbol.or(query.path).unwrap_or_default();
-    response(
-        cached_query_engine(&state).and_then(|engine| engine.explain(&target)),
-    )
+    response(cached_query_engine(&state).and_then(|engine| engine.explain(&target)))
 }
 
 fn clone_session(state: &AppState) -> RepositorySession {
@@ -238,7 +231,10 @@ fn cached_query_engine(
     }
     let session = clone_session(state);
     let engine = Arc::new(session.query_engine()?);
-    let mut guard = state.query_cache.write().expect("query cache lock poisoned");
+    let mut guard = state
+        .query_cache
+        .write()
+        .expect("query cache lock poisoned");
     *guard = Some(Arc::clone(&engine));
     Ok(engine)
 }
@@ -248,7 +244,10 @@ fn refresh_query_cache(
     session: &RepositorySession,
 ) -> Result<(), cortex_core::storage::CortexError> {
     let engine = Arc::new(session.query_engine()?);
-    let mut guard = state.query_cache.write().expect("query cache lock poisoned");
+    let mut guard = state
+        .query_cache
+        .write()
+        .expect("query cache lock poisoned");
     *guard = Some(engine);
     Ok(())
 }
