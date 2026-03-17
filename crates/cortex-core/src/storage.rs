@@ -22,13 +22,17 @@ pub enum CortexError {
     NotFound(String),
     #[error("parser error: {0}")]
     Parser(String),
-    #[error("indexing memory budget exceeded during {phase}: {usage_mb} MB used (limit {limit_mb} MB). Set CORTEX_MAX_INDEX_MEMORY_MB to adjust or 0 to disable.")]
+    #[error(
+        "indexing memory budget exceeded during {phase}: {usage_mb} MB used (limit {limit_mb} MB). Set CORTEX_MAX_INDEX_MEMORY_MB to adjust or 0 to disable."
+    )]
     MemoryBudgetExceeded {
         phase: String,
         usage_mb: u64,
         limit_mb: u64,
     },
-    #[error("invalid CORTEX_MAX_INDEX_MEMORY_MB value '{value}': expected a positive integer or 0 to disable the guard")]
+    #[error(
+        "invalid CORTEX_MAX_INDEX_MEMORY_MB value '{value}': expected a positive integer or 0 to disable the guard"
+    )]
     InvalidMemoryBudget { value: String },
     #[error("unable to read current process memory usage: {0}")]
     MemoryUsage(String),
@@ -198,10 +202,7 @@ impl SledGraphStore {
         for entry in walkdir::WalkDir::new(path) {
             let entry = entry.map_err(std::io::Error::other)?;
             if entry.file_type().is_file() {
-                size += entry
-                    .metadata()
-                    .map_err(std::io::Error::other)?
-                    .len();
+                size += entry.metadata().map_err(std::io::Error::other)?.len();
             }
         }
         Ok(size)
