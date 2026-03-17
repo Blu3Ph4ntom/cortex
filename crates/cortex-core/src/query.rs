@@ -601,18 +601,21 @@ impl QueryEngine {
     }
 
     fn query_result(&self, node_ids: HashSet<String>, edge_ids: HashSet<String>) -> QueryResult {
-        QueryResult {
-            nodes: node_ids
-                .iter()
-                .filter_map(|id| self.state.graph.nodes.get(id))
-                .cloned()
-                .collect(),
-            edges: edge_ids
-                .iter()
-                .filter_map(|id| self.state.graph.edges.get(id))
-                .cloned()
-                .collect(),
-        }
+        let mut nodes: Vec<_> = node_ids
+            .iter()
+            .filter_map(|id| self.state.graph.nodes.get(id))
+            .cloned()
+            .collect();
+        nodes.sort_by(|a, b| a.id.cmp(&b.id));
+
+        let mut edges: Vec<_> = edge_ids
+            .iter()
+            .filter_map(|id| self.state.graph.edges.get(id))
+            .cloned()
+            .collect();
+        edges.sort_by(|a, b| a.id.cmp(&b.id));
+
+        QueryResult { nodes, edges }
     }
 }
 
