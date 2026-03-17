@@ -315,3 +315,50 @@ pub fn display_path(path: &Path) -> PathBuf {
     let stripped = raw.strip_prefix("\\\\?\\").unwrap_or(&raw);
     PathBuf::from(stripped)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_normalize_path() {
+        assert_eq!(normalize_path(Path::new("src/main.rs")), "src/main.rs");
+        assert_eq!(normalize_path(Path::new("src\\main.rs")), "src/main.rs");
+        assert_eq!(normalize_path(Path::new("Src/Main.RS")), "src/main.rs");
+    }
+
+    #[test]
+    fn test_display_path() {
+        assert_eq!(
+            display_path(Path::new("src/main.rs")),
+            PathBuf::from("src/main.rs")
+        );
+        assert_eq!(
+            display_path(Path::new("\\\\?\\C:\\project\\src\\main.rs")),
+            PathBuf::from("C:\\project\\src\\main.rs")
+        );
+    }
+
+    #[test]
+    fn test_repo_node_id() {
+        assert_eq!(repo_node_id(Path::new("project/repo")), "repo::project/repo");
+    }
+
+    #[test]
+    fn test_file_node_id() {
+        assert_eq!(file_node_id(Path::new("src/main.rs")), "file::src/main.rs");
+    }
+
+    #[test]
+    fn test_symbol_node_id() {
+        assert_eq!(
+            symbol_node_id(Path::new("src/main.rs"), "foo_bar"),
+            "symbol::src/main.rs::foo_bar"
+        );
+    }
+
+    #[test]
+    fn test_external_module_id() {
+        assert_eq!(external_module_id("serde"), "module::serde");
+    }
+}
