@@ -233,6 +233,15 @@ impl QueryEngine {
             .as_ref()
             .zip(node.span.as_ref())
             .and_then(|(path, span)| {
+                // Security: verify the path is within the repository root.
+                if let Some(repo_path) = &self.state.repo_path {
+                    let full_repo = std::fs::canonicalize(repo_path).ok()?;
+                    let full_path = std::fs::canonicalize(path).ok()?;
+                    if !full_path.starts_with(full_repo) {
+                        return None;
+                    }
+                }
+
                 let source = std::fs::read_to_string(path).ok()?;
                 let start = span.start_line.saturating_sub(1);
                 let count = (span.end_line - span.start_line + 1).min(40);
