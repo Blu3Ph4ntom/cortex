@@ -232,12 +232,13 @@ impl Indexer {
 }
 
 fn canonicalize_refresh_path(path: &Path) -> PathBuf {
-    fs::canonicalize(path).unwrap_or_else(|_| {
+    let canonical = fs::canonicalize(path).unwrap_or_else(|_| {
         path.parent()
             .and_then(|parent| fs::canonicalize(parent).ok())
             .and_then(|parent| path.file_name().map(|name| parent.join(name)))
             .unwrap_or_else(|| path.to_path_buf())
-    })
+    });
+    display_path(&canonical)
 }
 
 #[derive(Clone, Copy, Debug)]
